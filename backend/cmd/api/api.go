@@ -1,6 +1,8 @@
 package main
 
 import (
+	"backend-web-commision-kana/internal/repo"
+	"backend-web-commision-kana/internal/users"
 	"log/slog"
 	"net/http"
 	"time"
@@ -28,13 +30,16 @@ func (api *Application) mount() http.Handler {
 		})
 	})
 
-	// userHandler := users.NewHandler()
+	queries := repo.New(api.DBConfig)
+	userSvc := users.NewServices(queries, api.DBConfig)
 
-	// r.Route("/api/", func(r chi.Router) {
-	// 	r.Route("/users", func(r chi.Router) {
-	// 		r.Post("/login", )
-	// 	}
-	// })
+	userHandler := users.NewHandler(userSvc, api.Conf.JSONres)
+
+	r.Route("/api", func(r chi.Router) {
+		r.Route("/auth", func(r chi.Router) {
+			r.Post("/login", userHandler.Login)
+		})
+	})
 
 	return r
 }
