@@ -22,5 +22,19 @@ body {
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
+  margin: 0;
+}
+
+#app {
+  color: var(--text-color);
+}
+
+h1,
+h2,
+h3,
+p,
+span,
+div {
+  color: inherit;
 }
 </style>
