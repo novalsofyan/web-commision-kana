@@ -1,3 +1,4 @@
+// Package users menyediakan type untuk autentikasi
 package users
 
 import (

@@ -1,3 +1,4 @@
+// Package users menyediakan handler untuk autentikasi
 package users
 
 import (

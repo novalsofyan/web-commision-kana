@@ -1,3 +1,5 @@
+// Package auth menyediakan middleware dan fungsi bantuan untuk menangani
+// autentikasi serta validasi token session.
 package auth
 
 import (

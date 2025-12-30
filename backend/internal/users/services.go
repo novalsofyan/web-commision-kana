@@ -1,3 +1,4 @@
+// Package users menyediakan service untuk autentikasi
 package users
 
 import (
@@ -28,14 +29,14 @@ func (s *svc) Login(ctx context.Context, req ReqLogin) (*ResLogin, error) {
 	user, err := s.repo.FindUsername(ctx, req.Username)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errors.New("username atau password salah!")
+			return nil, errors.New("username atau password salah")
 		}
 		return nil, err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		return nil, errors.New("username atau password salah!")
+		return nil, errors.New("username atau password salah")
 	}
 
 	token, err := security.GenerateRandomToken(64)

@@ -17,7 +17,7 @@ type Config struct {
 	Addr    string
 	Logger  *slog.Logger
 	JSONres jsonresp.JSONResponder
-	DbConf  *DBConfig
+	DBConf  *DBConfig
 }
 
 type Application struct {

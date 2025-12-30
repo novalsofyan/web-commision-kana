@@ -1,3 +1,4 @@
+// Package security menyediakan fungsi bantuan untuk autentikasi
 package security
 
 import (

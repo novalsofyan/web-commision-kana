@@ -1,3 +1,4 @@
+// Package jsonresp menyediakan JSON responder
 package jsonresp
 
 import (

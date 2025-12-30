@@ -47,7 +47,7 @@ func main() {
 		Addr:    ":8080",
 		JSONres: jsRes,
 		Logger:  logger,
-		DbConf:  dbCfg,
+		DBConf:  dbCfg,
 	}
 
 	web := &Application{
