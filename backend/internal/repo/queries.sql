@@ -14,3 +14,7 @@ WHERE token = $1;
 -- name: DeleteSessionByToken :exec
 DELETE FROM sessions
 WHERE token = $1;
+
+-- name: SelectUserBySession :one
+SELECT user_id FROM sessions
+WHERE token = $1;

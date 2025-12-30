@@ -48,6 +48,18 @@ func (q *Queries) SearchToken(ctx context.Context, token string) (string, error)
 	return token, err
 }
 
+const selectUserBySession = `-- name: SelectUserBySession :one
+SELECT user_id FROM sessions
+WHERE token = $1
+`
+
+func (q *Queries) SelectUserBySession(ctx context.Context, token string) (int32, error) {
+	row := q.db.QueryRow(ctx, selectUserBySession, token)
+	var user_id int32
+	err := row.Scan(&user_id)
+	return user_id, err
+}
+
 const setToken = `-- name: SetToken :one
 INSERT INTO sessions (user_id, token)
 VALUES ($1, $2)
