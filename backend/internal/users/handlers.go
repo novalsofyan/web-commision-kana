@@ -4,6 +4,7 @@ import (
 	"backend-web-commision-kana/internal/utils/jsonresp"
 	"encoding/json"
 	"net/http"
+	"strings"
 )
 
 type Handler struct {
@@ -34,5 +35,27 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	h.resp.WriteData(w, http.StatusOK, res)
+}
+
+func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
+	// 1. Ambil token dari Header (karena dikirim via Vue/Axios di header)
+	authHeader := r.Header.Get("Authorization")
+
+	// Kita bersihkan prefix "Bearer " (jika ada)
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	token = strings.TrimSpace(token)
+
+	// 2. Panggil Service Logout
+	// Kita bungkus token ke struct ReqLogout sesuai kontrak service kamu
+	res, err := h.svc.Logout(r.Context(), ReqLogout{Token: token})
+	if err != nil {
+		h.resp.WriteData(w, http.StatusUnauthorized, map[string]string{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	// 3. Response Berhasil
 	h.resp.WriteData(w, http.StatusOK, res)
 }

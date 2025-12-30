@@ -9,6 +9,16 @@ import (
 	"context"
 )
 
+const deleteSessionByToken = `-- name: DeleteSessionByToken :exec
+DELETE FROM sessions
+WHERE token = $1
+`
+
+func (q *Queries) DeleteSessionByToken(ctx context.Context, token string) error {
+	_, err := q.db.Exec(ctx, deleteSessionByToken, token)
+	return err
+}
+
 const findUsername = `-- name: FindUsername :one
 SELECT id, username, password FROM users
 WHERE username = $1 LIMIT 1
@@ -25,6 +35,17 @@ func (q *Queries) FindUsername(ctx context.Context, username string) (FindUserna
 	var i FindUsernameRow
 	err := row.Scan(&i.ID, &i.Username, &i.Password)
 	return i, err
+}
+
+const searchToken = `-- name: SearchToken :one
+SELECT token FROM sessions
+WHERE token = $1
+`
+
+func (q *Queries) SearchToken(ctx context.Context, token string) (string, error) {
+	row := q.db.QueryRow(ctx, searchToken, token)
+	err := row.Scan(&token)
+	return token, err
 }
 
 const setToken = `-- name: SetToken :one

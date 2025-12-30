@@ -65,7 +65,7 @@ func main() {
 	// buka pool pake
 	pool, err := pgxpool.NewWithConfig(ctx, pCfg)
 	if err != nil {
-		log.Fatal("Can't connect database")
+		log.Fatal("Can't connect database", err)
 	}
 
 	if err := pool.Ping(ctx); err != nil {
@@ -74,7 +74,7 @@ func main() {
 
 	defer pool.Close()
 
-	web.DBConfig = pool
+	web.DB = pool
 
 	if err := web.run(web.mount()); err != nil {
 		slog.Error("Server can't start!", "status", http.StatusInternalServerError, "error", err)

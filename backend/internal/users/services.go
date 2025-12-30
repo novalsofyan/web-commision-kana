@@ -35,7 +35,7 @@ func (s *svc) Login(ctx context.Context, req ReqLogin) (*ResLogin, error) {
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		return nil, errors.New("username atau password salah")
+		return nil, errors.New("username atau password salah!")
 	}
 
 	token, err := security.GenerateRandomToken(64)
@@ -56,5 +56,16 @@ func (s *svc) Login(ctx context.Context, req ReqLogin) (*ResLogin, error) {
 	return &ResLogin{
 		Token:    savedToken,
 		Username: user.Username,
+	}, nil
+}
+
+func (s *svc) Logout(ctx context.Context, req ReqLogout) (*ResLogout, error) {
+	if err := s.repo.DeleteSessionByToken(ctx, req.Token); err != nil {
+		slog.Error("failed to delete session", "error", err)
+		return nil, err
+	}
+
+	return &ResLogout{
+		Msg: "logout success!",
 	}, nil
 }

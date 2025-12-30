@@ -7,6 +7,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type DBConfig struct {
+	DSN      string
+	maxConns int
+	minConns int
+}
+
 type Config struct {
 	Addr    string
 	Logger  *slog.Logger
@@ -14,13 +20,7 @@ type Config struct {
 	DbConf  *DBConfig
 }
 
-type DBConfig struct {
-	DSN      string
-	maxConns int
-	minConns int
-}
-
 type Application struct {
-	Conf     *Config
-	DBConfig *pgxpool.Pool
+	Conf *Config
+	DB   *pgxpool.Pool
 }

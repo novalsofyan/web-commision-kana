@@ -9,7 +9,9 @@ import (
 )
 
 type Querier interface {
+	DeleteSessionByToken(ctx context.Context, token string) error
 	FindUsername(ctx context.Context, username string) (FindUsernameRow, error)
+	SearchToken(ctx context.Context, token string) (string, error)
 	SetToken(ctx context.Context, arg SetTokenParams) (string, error)
 }
 
