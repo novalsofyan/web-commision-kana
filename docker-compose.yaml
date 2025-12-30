@@ -27,6 +27,7 @@ services:
         condition: service_healthy
     environment:
       - DB_URL=postgres://nosora:1111@db:5432/kana_commision?sslmode=disable
+      - GOOSE_DBSTRING=host=db port=5432 user=nosora password=1111 dbname=kana_commision sslmode=disable
       - APP_PORT=8080
       - PROJECT_ENV=production
 

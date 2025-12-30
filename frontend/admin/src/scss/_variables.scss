@@ -1,0 +1,14 @@
+// src/scss/_variables.scss
+
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --primary-color: #66cf8e;
+}
+
+// Selector ini penting! Harus menempel di html tag
+[data-theme='dark'] {
+  --bg-color: #333333;
+  --text-color: #e0e0e0;
+  --primary-color: #7cffae;
+}
