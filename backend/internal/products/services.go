@@ -22,6 +22,17 @@ func NewService(repos *repo.Queries, dbs *pgxpool.Pool) Service {
 	}
 }
 
-func (s *svc) CreateProduct(ctx context.Context, req ReqAdminProducts) (*ResAdminProduct, error) {
-	return nil, nil
+func (s *svc) CreateProduct(ctx context.Context, req ReqAdminProducts, userID int32) (*ResAdminProduct, error) {
+	err := s.repo.CreateProducts(ctx, repo.CreateProductsParams{
+		NamaProducts: req.ProductName,
+		Price:        req.ProductPrice,
+		UserID:       userID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &ResAdminProduct{
+		Msg: "Produk berhasil dibuat!",
+	}, nil
 }

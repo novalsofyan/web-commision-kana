@@ -20,7 +20,5 @@ SELECT user_id FROM sessions
 WHERE token = $1;
 
 -- name: CreateProducts :exec
-INSERT INTO products (nama_products, price)
-VALUES ($1, $2);
-
--- name: 
+INSERT INTO products (nama_products, price, user_id)
+VALUES ($1, $2, $3);

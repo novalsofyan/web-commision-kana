@@ -9,6 +9,7 @@ import (
 )
 
 type Querier interface {
+	CreateProducts(ctx context.Context, arg CreateProductsParams) error
 	DeleteSessionByToken(ctx context.Context, token string) error
 	FindUsername(ctx context.Context, username string) (FindUsernameRow, error)
 	SearchToken(ctx context.Context, token string) (string, error)

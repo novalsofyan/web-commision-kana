@@ -9,6 +9,22 @@ import (
 	"context"
 )
 
+const createProducts = `-- name: CreateProducts :exec
+INSERT INTO products (nama_products, price, user_id)
+VALUES ($1, $2, $3)
+`
+
+type CreateProductsParams struct {
+	NamaProducts string `json:"nama_products"`
+	Price        int32  `json:"price"`
+	UserID       int32  `json:"user_id"`
+}
+
+func (q *Queries) CreateProducts(ctx context.Context, arg CreateProductsParams) error {
+	_, err := q.db.Exec(ctx, createProducts, arg.NamaProducts, arg.Price, arg.UserID)
+	return err
+}
+
 const deleteSessionByToken = `-- name: DeleteSessionByToken :exec
 DELETE FROM sessions
 WHERE token = $1
