@@ -1,7 +1,7 @@
 package main
 
 import (
-	auth "backend-web-commision-kana/internal/middleware"
+	auth "backend-web-commision-kana/internal/middleware/auth"
 	"backend-web-commision-kana/internal/repo"
 	"backend-web-commision-kana/internal/users"
 	"log/slog"

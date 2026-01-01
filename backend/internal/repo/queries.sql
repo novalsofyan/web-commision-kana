@@ -18,3 +18,9 @@ WHERE token = $1;
 -- name: SelectUserBySession :one
 SELECT user_id FROM sessions
 WHERE token = $1;
+
+-- name: CreateProducts :exec
+INSERT INTO products (nama_products, price)
+VALUES ($1, $2);
+
+-- name: 

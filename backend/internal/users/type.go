@@ -8,7 +8,7 @@ import (
 
 type Service interface {
 	Login(ctx context.Context, req ReqLogin) (*ResLogin, error)
-	Logout(ctx context.Context, req ReqLogout) (*ResLogout, error)
+	Logout(ctx context.Context, token string) (*ResLogout, error)
 }
 
 type ReqLogin struct {

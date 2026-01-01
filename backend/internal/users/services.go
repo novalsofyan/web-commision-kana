@@ -60,8 +60,8 @@ func (s *svc) Login(ctx context.Context, req ReqLogin) (*ResLogin, error) {
 	}, nil
 }
 
-func (s *svc) Logout(ctx context.Context, req ReqLogout) (*ResLogout, error) {
-	if err := s.repo.DeleteSessionByToken(ctx, req.Token); err != nil {
+func (s *svc) Logout(ctx context.Context, token string) (*ResLogout, error) {
+	if err := s.repo.DeleteSessionByToken(ctx, token); err != nil {
 		slog.Error("failed to delete session", "error", err)
 		return nil, err
 	}
