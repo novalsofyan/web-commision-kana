@@ -7,6 +7,8 @@ package repo
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 const createProducts = `-- name: CreateProducts :exec
@@ -23,6 +25,15 @@ type CreateProductsParams struct {
 func (q *Queries) CreateProducts(ctx context.Context, arg CreateProductsParams) error {
 	_, err := q.db.Exec(ctx, createProducts, arg.NamaProducts, arg.Price, arg.UserID)
 	return err
+}
+
+const deleteProduct = `-- name: DeleteProduct :execresult
+DELETE FROM products
+WHERE id = $1
+`
+
+func (q *Queries) DeleteProduct(ctx context.Context, id int32) (pgconn.CommandTag, error) {
+	return q.db.Exec(ctx, deleteProduct, id)
 }
 
 const deleteSessionByToken = `-- name: DeleteSessionByToken :exec

@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import axios, { AxiosError } from 'axios'
 import { useDarkMode } from '@/composables/useDarkMode'
 
-// 1. Definisikan Interface Response API (Biar gak pake 'any')
 interface LoginResponse {
   data: {
     token: string
@@ -15,13 +14,11 @@ interface LoginResponse {
 const { setTheme, currentTheme } = useDarkMode()
 const router = useRouter()
 
-// 2. State untuk form & feedback
 const username = ref<string>('')
 const password = ref<string>('')
 const isLoading = ref<boolean>(false)
 const errorMessage = ref<string>('')
 
-// 3. Logika Login
 const handleLogin = async (): Promise<void> => {
   if (!username.value || !password.value) {
     errorMessage.value = 'Isi dulu username & password-nya ya!'
@@ -33,7 +30,7 @@ const handleLogin = async (): Promise<void> => {
 
   try {
     const response = await axios.post<LoginResponse>(
-      'http://localhost:8080/api/auth/login',
+      `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
       {
         username: username.value,
         password: password.value,
@@ -115,7 +112,6 @@ const handleLogin = async (): Promise<void> => {
 </template>
 
 <style lang="scss" scoped>
-// STYLE KAMU YANG ASLI (TIDAK BERUBAH SAMA SEKALI)
 main {
   min-height: 100vh;
   display: flex;

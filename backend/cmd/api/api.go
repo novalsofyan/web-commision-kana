@@ -2,6 +2,7 @@ package main
 
 import (
 	auth "backend-web-commision-kana/internal/middleware/auth"
+	"backend-web-commision-kana/internal/products"
 	"backend-web-commision-kana/internal/repo"
 	"backend-web-commision-kana/internal/users"
 	"log/slog"
@@ -18,7 +19,9 @@ func (api *Application) mount() http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4173", "http://127.0.0.1:4173"},
+		AllowedOrigins: []string{
+			"http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4173",
+			"http://127.0.0.1:4173", "http://192.168.1.6:5173"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
@@ -45,17 +48,37 @@ func (api *Application) mount() http.Handler {
 	userSvc := users.NewServices(queries, api.DB)
 	userHandler := users.NewHandler(userSvc, api.Conf.JSONres)
 
+	productSvc := products.NewService(queries, api.DB)
+	productHandler := products.NewHandler(productSvc, api.Conf.JSONres)
+
+	// localhost:port/api/*
 	r.Route("/api", func(r chi.Router) {
+		// localhost:port/api/auth
 		r.Route("/auth", func(r chi.Router) {
+			// localhost:port/api/auth/login
 			r.Post("/login", userHandler.Login)
 			r.Group(func(r chi.Router) {
+				// Middleware Auth
 				r.Use(auth.AuthMiddleware(queries))
+				// localhost:port/api/auth/me
 				r.Get("/me", func(w http.ResponseWriter, r *http.Request) {
 					api.Conf.JSONres.WriteData(w, http.StatusOK, map[string]any{
 						"status": "authenticated",
 					})
 				})
+				// localhost:port/api/auth/logout
 				r.Post("/logout", userHandler.Logout)
+			})
+		})
+
+		// localhost:port/api/products/*
+		r.Route("/products", func(r chi.Router) {
+			r.Group(func(r chi.Router) {
+				// Middleware Auth
+				r.Use(auth.AuthMiddleware(queries))
+				// localhost:port/api/products
+				r.Post("/", productHandler.CreateProduct)
+				r.Delete("/{product_id}", productHandler.DeleteProduct)
 			})
 		})
 	})

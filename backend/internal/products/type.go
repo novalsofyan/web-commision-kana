@@ -7,6 +7,10 @@ type ReqAdminProducts struct {
 	ProductPrice int32  `json:"product_price"`
 }
 
+type ReqAdminDeleteProduct struct {
+	ProductID int32
+}
+
 type ResAdminProduct struct {
 	Msg string `json:"msg"`
 }

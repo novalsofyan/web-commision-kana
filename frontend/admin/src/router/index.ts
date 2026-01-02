@@ -19,7 +19,6 @@ const router = createRouter({
       component: () => import('@/pages/DashboardPage.vue'),
       meta: { requiresAuth: true },
     },
-    // INI DIA: Route 404 yang baru
     {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
@@ -39,7 +38,7 @@ router.beforeEach(async (to, from, next) => {
     }
 
     try {
-      await axios.get('http://localhost:8080/api/auth/me', {
+      await axios.get('http://192.168.1.6:8080/api/auth/me', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

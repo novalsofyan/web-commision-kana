@@ -13,6 +13,8 @@ type svc struct {
 }
 
 type Service interface {
+	CreateProduct(ctx context.Context, req ReqAdminProducts, userID int32) (*ResAdminProduct, error)
+	DeleteProduct(ctx context.Context, productID int32) (*ResAdminProduct, error)
 }
 
 func NewService(repos *repo.Queries, dbs *pgxpool.Pool) Service {
@@ -34,5 +36,20 @@ func (s *svc) CreateProduct(ctx context.Context, req ReqAdminProducts, userID in
 
 	return &ResAdminProduct{
 		Msg: "Produk berhasil dibuat!",
+	}, nil
+}
+
+func (s *svc) DeleteProduct(ctx context.Context, productID int32) (*ResAdminProduct, error) {
+	result, err := s.repo.DeleteProduct(ctx, productID)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.RowsAffected() == 0 {
+		return nil, nil
+	}
+
+	return &ResAdminProduct{
+		Msg: "Produk berhasil dihapus!",
 	}, nil
 }

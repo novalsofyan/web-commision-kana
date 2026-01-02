@@ -13,13 +13,12 @@ import axios from 'axios'
 
 const router = useRouter()
 
-// Fungsi ini harus dipanggil di template supaya ESLint nggak protes
 const logout = async () => {
   try {
     const token = sessionStorage.getItem('auth_token')
     if (token) {
       await axios.post(
-        'http://localhost:8080/api/auth/logout',
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },

@@ -20,8 +20,10 @@ func NewHandler(svc Service, resp jsonresp.JSONResponder) *Handler {
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	var req ReqLogin
 
-	// 1. Decode JSON
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	if err := decoder.Decode(&req); err != nil {
 		h.resp.WriteData(w, http.StatusBadRequest, map[string]string{
 			"error": "request tidak valid",
 		})
