@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import NavbarDashboard from '@/components/NavbarDashboard.vue'
+import { FilePlus } from 'lucide-vue-next';
 </script>
 
 <template>
   <div class="layout-wrapper">
     <main class="dashboard-container">
       <h1>Dashboard Utama</h1>
-      <p>Selamat datang!</p>
+      <p style="padding-bottom: 1rem;">Selamat datang!</p>
 
-      <div class="content-placeholder"></div>
+      <div class="products-dashboard">
+        <div class="product-title">
+          <p>Manajemen Produk</p>
+          <FilePlus class="plus-product"/>
+        </div>
+      </div>
     </main>
 
     <NavbarDashboard />
@@ -20,17 +26,34 @@ import NavbarDashboard from '@/components/NavbarDashboard.vue'
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-color, #f9fafb);
+  background-color: var(--bg-color);
+  max-width: 1200px;
+  margin: 0 auto
 }
 
 .dashboard-container {
   flex: 1;
   padding: 2rem;
-  padding-bottom: 100px;
   text-align: center;
 }
 
-.content-placeholder {
-  margin-top: 2rem;
+.products-dashboard {
+  border-top: 0.1rem solid var(--primary-color);
+  text-align: left;
+  color: var(--text-color);
+  padding-top: 1rem;
+  padding-bottom: 100px;
+}
+
+.product-title {
+  font-size: 1.6rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+
+  .plus-product {
+    color: var(--primary-color);
+    cursor: pointer;
+  }
 }
 </style>
