@@ -20,6 +20,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/settings',
+      name: 'Settings',
+      component: () => import('@/pages/SettingsPage.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
       component: () => import('@/pages/NotFound.vue'),
@@ -27,18 +33,21 @@ const router = createRouter({
   ],
 })
 
-// Middleware Global
+// Middleware Global (Navigation Guard)
 router.beforeEach(async (to, from, next) => {
   const token = sessionStorage.getItem('auth_token')
 
-  // Cek apakah halaman yang dituju butuh login
-  if (to.meta.requiresAuth) {
+  // 1. Cek apakah halaman yang dituju (atau parent-nya) butuh auth
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    // Kalau nggak ada token, langsung tendang ke Login
     if (!token) {
       return next({ name: 'Login' })
     }
 
     try {
-      await axios.get('http://192.168.1.6:8080/api/auth/me', {
+      // Validasi token ke backend
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://192.168.1.6:8080'
+      await axios.get(`${baseUrl}/api/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -51,10 +60,13 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  // Kalau user sudah login tapi mau buka halaman login
+  // 2. Kalau user sudah login (punya token) tapi iseng mau buka halaman login
   else if (to.name === 'Login' && token) {
     next({ name: 'Dashboard' })
-  } else {
+  }
+
+  // 3. Halaman umum (Login atau 404)
+  else {
     next()
   }
 })

@@ -1,35 +1,36 @@
+<script setup lang="ts">
+import NavbarDashboard from '@/components/NavbarDashboard.vue'
+</script>
+
 <template>
-  <div style="padding: 2rem; text-align: center">
-    <h1>🚀 Dashboard Utama</h1>
-    <button @click="logout" style="padding: 0.5rem 1rem; cursor: pointer">
-      Logout
-    </button>
+  <div class="layout-wrapper">
+    <main class="dashboard-container">
+      <h1>Dashboard Utama</h1>
+      <p>Selamat datang!</p>
+
+      <div class="content-placeholder"></div>
+    </main>
+
+    <NavbarDashboard />
   </div>
 </template>
 
-<script setup lang="ts">
-import { useRouter } from 'vue-router'
-import axios from 'axios'
-
-const router = useRouter()
-
-const logout = async () => {
-  try {
-    const token = sessionStorage.getItem('auth_token')
-    if (token) {
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      )
-    }
-  } catch (error) {
-    console.error('Logout backend gagal:', error)
-  } finally {
-    sessionStorage.removeItem('auth_token')
-    router.push('/login')
-  }
+<style lang="scss" scoped>
+.layout-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-color, #f9fafb);
 }
-</script>
+
+.dashboard-container {
+  flex: 1;
+  padding: 2rem;
+  padding-bottom: 100px;
+  text-align: center;
+}
+
+.content-placeholder {
+  margin-top: 2rem;
+}
+</style>
