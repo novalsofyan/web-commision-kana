@@ -41,8 +41,8 @@ func (s *svc) Login(ctx context.Context, req ReqLogin) (*ResLogin, error) {
 
 	token, err := security.GenerateRandomToken(64)
 	if err != nil {
-		slog.Error("Failed to generate token", "error", err)
-		return nil, err
+		slog.Error("Gagal membuat token", "error", err)
+		return nil, errors.New("terjadi kesalahan internal pada server")
 	}
 
 	savedToken, err := s.repo.SetToken(ctx, repo.SetTokenParams{
@@ -50,8 +50,8 @@ func (s *svc) Login(ctx context.Context, req ReqLogin) (*ResLogin, error) {
 		Token:  token,
 	})
 	if err != nil {
-		slog.Error("Failed to save tokens", "error", err)
-		return nil, err
+		slog.Error("Gagal menyimpan token ke database", "error", err)
+		return nil, errors.New("terjadi kesalahan internal pada server")
 	}
 
 	return &ResLogin{
@@ -62,11 +62,11 @@ func (s *svc) Login(ctx context.Context, req ReqLogin) (*ResLogin, error) {
 
 func (s *svc) Logout(ctx context.Context, token string) (*ResLogout, error) {
 	if err := s.repo.DeleteSessionByToken(ctx, token); err != nil {
-		slog.Error("failed to delete session", "error", err)
-		return nil, err
+		slog.Error("Gagal menghapus sesi", "error", err)
+		return nil, errors.New("gagal logout, silahkan coba lagi")
 	}
 
 	return &ResLogout{
-		Msg: "logout success!",
+		Msg: "logout berhasil!",
 	}, nil
 }

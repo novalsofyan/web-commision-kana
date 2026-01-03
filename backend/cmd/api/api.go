@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog/v3"
+	"github.com/go-chi/httprate"
 	"github.com/rs/cors"
 )
 
@@ -31,11 +32,20 @@ func (api *Application) mount() http.Handler {
 
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
-	// Use httplog
+	r.Use(middleware.Recoverer)
+	r.Use(httprate.Limit(
+		100,
+		1*time.Minute,
+		httprate.WithKeyFuncs(httprate.KeyByIP),
+		httprate.WithLimitHandler(func(w http.ResponseWriter, r *http.Request) {
+			api.Conf.JSONres.WriteData(w, http.StatusTooManyRequests, map[string]string{
+				"error": "Terlalu banyak request",
+			})
+		}),
+	))
 	r.Use(httplog.RequestLogger(api.Conf.Logger, &httplog.Options{
 		Level: slog.LevelInfo,
 	}))
-	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(30 * time.Second))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +66,7 @@ func (api *Application) mount() http.Handler {
 		r.Route("/auth", func(r chi.Router) {
 			r.Post("/login", userHandler.Login)
 			r.Group(func(r chi.Router) {
-				r.Use(auth.AuthMiddleware(queries))
+				r.Use(auth.AuthMiddleware(queries, api.Conf.JSONres))
 				r.Get("/me", func(w http.ResponseWriter, r *http.Request) {
 					api.Conf.JSONres.WriteData(w, http.StatusOK, map[string]any{
 						"status": "authenticated",
@@ -68,7 +78,7 @@ func (api *Application) mount() http.Handler {
 
 		r.Route("/admin", func(r chi.Router) {
 			r.Group(func(r chi.Router) {
-				r.Use(auth.AuthMiddleware(queries))
+				r.Use(auth.AuthMiddleware(queries, api.Conf.JSONres))
 				r.Get("/products", productHandler.GetProductAdmin)
 				r.Post("/products", productHandler.CreateProduct)
 				r.Delete("/products/{product_id}", productHandler.DeleteProduct)

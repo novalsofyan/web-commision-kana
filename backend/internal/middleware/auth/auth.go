@@ -3,12 +3,13 @@ package auth
 
 import (
 	"backend-web-commision-kana/internal/repo"
+	"backend-web-commision-kana/internal/utils/jsonresp"
 	"context"
 	"net/http"
 	"strings"
 )
 
-func AuthMiddleware(queries *repo.Queries) func(http.Handler) http.Handler {
+func AuthMiddleware(queries *repo.Queries, resp jsonresp.JSONResponder) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")
@@ -16,13 +17,17 @@ func AuthMiddleware(queries *repo.Queries) func(http.Handler) http.Handler {
 			token = strings.TrimSpace(token)
 
 			if token == "" {
-				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				resp.WriteData(w, http.StatusUnauthorized, map[string]string{
+					"error": "Unauthorized",
+				})
 				return
 			}
 
 			userID, err := queries.SelectUserBySession(r.Context(), token)
 			if err != nil {
-				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				resp.WriteData(w, http.StatusUnauthorized, map[string]string{
+					"error": "Unauthorized",
+				})
 				return
 			}
 

@@ -61,17 +61,13 @@ func (s *svc) GetProductAdmin(ctx context.Context, userID int32) ([]ResAdminGetP
 		return nil, err
 	}
 
-	var productItems []ResAdminGetProduct
+	productItems := make([]ResAdminGetProduct, 0, len(rows))
 	for _, row := range rows {
 		productItems = append(productItems, ResAdminGetProduct{
 			ProductID:    row.ID,
 			ProductName:  row.NamaProducts,
 			ProductPrice: row.Price,
 		})
-	}
-
-	if productItems == nil {
-		productItems = []ResAdminGetProduct{}
 	}
 
 	return productItems, nil
