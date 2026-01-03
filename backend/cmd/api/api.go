@@ -51,34 +51,27 @@ func (api *Application) mount() http.Handler {
 	productSvc := products.NewService(queries, api.DB)
 	productHandler := products.NewHandler(productSvc, api.Conf.JSONres)
 
-	// localhost:port/api/*
 	r.Route("/api", func(r chi.Router) {
-		// localhost:port/api/auth
+
 		r.Route("/auth", func(r chi.Router) {
-			// localhost:port/api/auth/login
 			r.Post("/login", userHandler.Login)
 			r.Group(func(r chi.Router) {
-				// Middleware Auth
 				r.Use(auth.AuthMiddleware(queries))
-				// localhost:port/api/auth/me
 				r.Get("/me", func(w http.ResponseWriter, r *http.Request) {
 					api.Conf.JSONres.WriteData(w, http.StatusOK, map[string]any{
 						"status": "authenticated",
 					})
 				})
-				// localhost:port/api/auth/logout
 				r.Post("/logout", userHandler.Logout)
 			})
 		})
 
-		// localhost:port/api/products/*
-		r.Route("/products", func(r chi.Router) {
+		r.Route("/admin", func(r chi.Router) {
 			r.Group(func(r chi.Router) {
-				// Middleware Auth
 				r.Use(auth.AuthMiddleware(queries))
-				// localhost:port/api/products
-				r.Post("/", productHandler.CreateProduct)
-				r.Delete("/{product_id}", productHandler.DeleteProduct)
+				r.Get("/products", productHandler.GetProductAdmin)
+				r.Post("/products", productHandler.CreateProduct)
+				r.Delete("/products/{product_id}", productHandler.DeleteProduct)
 			})
 		})
 	})

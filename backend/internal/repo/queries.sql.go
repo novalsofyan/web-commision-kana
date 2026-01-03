@@ -64,6 +64,38 @@ func (q *Queries) FindUsername(ctx context.Context, username string) (FindUserna
 	return i, err
 }
 
+const getProductAdmin = `-- name: GetProductAdmin :many
+SELECT id, nama_products, price 
+FROM products 
+WHERE user_id = $1
+`
+
+type GetProductAdminRow struct {
+	ID           int32  `json:"id"`
+	NamaProducts string `json:"nama_products"`
+	Price        int32  `json:"price"`
+}
+
+func (q *Queries) GetProductAdmin(ctx context.Context, userID int32) ([]GetProductAdminRow, error) {
+	rows, err := q.db.Query(ctx, getProductAdmin, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductAdminRow
+	for rows.Next() {
+		var i GetProductAdminRow
+		if err := rows.Scan(&i.ID, &i.NamaProducts, &i.Price); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const searchToken = `-- name: SearchToken :one
 SELECT token FROM sessions
 WHERE token = $1

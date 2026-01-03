@@ -1,23 +1,33 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import NavbarDashboard from '@/components/NavbarDashboard.vue'
-import { FilePlus } from 'lucide-vue-next';
+import ModalAddProduct from '@/components/ModalAddProduct.vue'
+import { FilePlus } from 'lucide-vue-next'
+
+const isModalOpen = ref(false)
+
+const handleRefresh = () => {
+  console.log('Data perlu di-refresh ke API...')
+}
 </script>
 
 <template>
   <div class="layout-wrapper">
     <main class="dashboard-container">
       <h1>Dashboard Utama</h1>
-      <p style="padding-bottom: 1rem;">Selamat datang!</p>
+      <p style="padding-bottom: 1rem">Selamat datang!</p>
 
       <div class="products-dashboard">
         <div class="product-title">
           <p>Manajemen Produk</p>
-          <FilePlus class="plus-product"/>
+          <FilePlus class="plus-product" @click="isModalOpen = true" />
         </div>
       </div>
     </main>
 
     <NavbarDashboard />
+
+    <ModalAddProduct :is-open="isModalOpen" @close="isModalOpen = false" @refresh="handleRefresh" />
   </div>
 </template>
 
@@ -28,7 +38,7 @@ import { FilePlus } from 'lucide-vue-next';
   flex-direction: column;
   background-color: var(--bg-color);
   max-width: 1200px;
-  margin: 0 auto
+  margin: 0 auto;
 }
 
 .dashboard-container {
@@ -42,7 +52,6 @@ import { FilePlus } from 'lucide-vue-next';
   text-align: left;
   color: var(--text-color);
   padding-top: 1rem;
-  padding-bottom: 100px;
 }
 
 .product-title {
@@ -54,6 +63,9 @@ import { FilePlus } from 'lucide-vue-next';
   .plus-product {
     color: var(--primary-color);
     cursor: pointer;
+    &:hover {
+      transform: scale(1.1);
+    }
   }
 }
 </style>

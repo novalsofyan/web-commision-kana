@@ -15,6 +15,7 @@ type Querier interface {
 	DeleteProduct(ctx context.Context, id int32) (pgconn.CommandTag, error)
 	DeleteSessionByToken(ctx context.Context, token string) error
 	FindUsername(ctx context.Context, username string) (FindUsernameRow, error)
+	GetProductAdmin(ctx context.Context, userID int32) ([]GetProductAdminRow, error)
 	SearchToken(ctx context.Context, token string) (string, error)
 	SelectUserBySession(ctx context.Context, token string) (int32, error)
 	SetToken(ctx context.Context, arg SetTokenParams) (string, error)

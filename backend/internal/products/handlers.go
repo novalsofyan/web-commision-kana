@@ -81,3 +81,23 @@ func (h *Handler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	h.resp.WriteData(w, http.StatusOK, res)
 }
+
+func (h *Handler) GetProductAdmin(w http.ResponseWriter, r *http.Request) {
+	userID, ok := auth.GetUserID(r)
+	if !ok {
+		h.resp.WriteData(w, http.StatusUnauthorized, map[string]string{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	res, err := h.svc.GetProductAdmin(r.Context(), userID)
+	if err != nil {
+		h.resp.WriteData(w, http.StatusInternalServerError, map[string]string{
+			"error": "Internal server error: " + err.Error(),
+		})
+		return
+	}
+
+	h.resp.WriteData(w, http.StatusOK, res)
+}

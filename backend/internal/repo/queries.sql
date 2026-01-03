@@ -26,3 +26,8 @@ VALUES ($1, $2, $3);
 -- name: DeleteProduct :execresult
 DELETE FROM products
 WHERE id = $1;
+
+-- name: GetProductAdmin :many
+SELECT id, nama_products, price 
+FROM products 
+WHERE user_id = $1;

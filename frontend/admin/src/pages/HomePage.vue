@@ -98,7 +98,6 @@ const handleLogin = async (): Promise<void> => {
 </template>
 
 <style lang="scss" scoped>
-/* Pakai PX biar font gak jadi kecil kayak semut! */
 .login-page {
   min-height: 100vh;
   display: flex;
@@ -151,7 +150,7 @@ const handleLogin = async (): Promise<void> => {
     padding: 12px 15px;
     font-size: 16px;
     border-radius: 8px;
-    border: 2px solid #ddd; /* Border terlihat jelas */
+    border: 2px solid #ddd;
     background: #fff;
     color: #333;
     outline: none;

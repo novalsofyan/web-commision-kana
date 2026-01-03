@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { House, User, Settings } from 'lucide-vue-next'
 
 const menuItems = [
-  { label: 'Home', path: '/dashboard' },
-  { label: 'Profile', path: '/profile' },
-  { label: 'Settings', path: '/settings' },
+  { label: 'Home', path: '/dashboard', iconImage: House },
+  { label: 'Profile', path: '/profile', iconImage: User },
+  { label: 'Settings', path: '/settings', iconImage: Settings },
 ]
 </script>
 
@@ -13,7 +14,7 @@ const menuItems = [
     <div class="nav-wrapper">
       <div class="scroll-container">
         <RouterLink v-for="(item, index) in menuItems" :key="index" :to="item.path" class="nav-item">
-          <div class="icon-circle"></div>
+          <component :is="item.iconImage" class="icon-style" />
           <span class="label-text">{{ item.label }}</span>
         </RouterLink>
       </div>
@@ -22,7 +23,6 @@ const menuItems = [
 </template>
 
 <style scoped lang="scss">
-/* Container utama untuk memposisikan navbar di bawah layar */
 .nav-bottom {
   position: fixed;
   bottom: 0;
@@ -48,7 +48,6 @@ const menuItems = [
   overflow: hidden;
 }
 
-/* Area yang bisa digeser (Horizontal Scroll) */
 .scroll-container {
   display: flex;
   align-items: center;
@@ -63,8 +62,6 @@ const menuItems = [
   }
   -ms-overflow-style: none;
   scrollbar-width: none;
-
-  /* Supaya kalau menu cuma sedikit, dia tetep rata tengah */
   justify-content: space-around;
 }
 
@@ -87,11 +84,6 @@ const menuItems = [
   /* Style saat link aktif/diklik */
   &.router-link-active {
     color: var(--primary-color);
-    .icon-circle {
-      background-color: var(--primary-color);
-      border-color: var(--primary-color);
-      transform: scale(1.1);
-    }
   }
 
   &:active {
@@ -99,19 +91,9 @@ const menuItems = [
   }
 }
 
-/* Lingkaran di atas text */
-.icon-circle {
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--primary-color);
-  border-radius: 50%;
-  margin-bottom: 4px;
-  transition: all 0.3s ease;
-}
-
 /* Label text menu */
 .label-text {
   font-size: 10px;
-  white-space: nowrap; /* Teks tidak akan wrap ke bawah */
+  white-space: nowrap;
 }
 </style>
