@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import NavbarDashboard from '@/components/NavbarDashboard.vue'
 import ModalAddProduct from '@/components/ModalAddProduct.vue'
+import ProductList from '@/components/ProductList.vue'
 import { FilePlus } from 'lucide-vue-next'
 
 const isModalOpen = ref(false)
@@ -14,8 +15,8 @@ const handleRefresh = () => {
 <template>
   <div class="layout-wrapper">
     <main class="dashboard-container">
-      <h1>Dashboard Utama</h1>
-      <p style="padding-bottom: 1rem">Selamat datang!</p>
+      <h1 class="dashboard-title">Dashboard Utama</h1>
+      <p class="dashboard-subtitle">Selamat datang!</p>
 
       <div class="products-dashboard">
         <div class="product-title">
@@ -23,6 +24,7 @@ const handleRefresh = () => {
           <FilePlus class="plus-product" @click="isModalOpen = true" />
         </div>
       </div>
+      <ProductList />
     </main>
 
     <NavbarDashboard />
@@ -38,13 +40,22 @@ const handleRefresh = () => {
   flex-direction: column;
   background-color: var(--bg-color);
   max-width: 1200px;
+  padding-bottom: 8rem;
   margin: 0 auto;
 }
 
 .dashboard-container {
   flex: 1;
   padding: 2rem;
-  text-align: center;
+
+  .dashboard-title {
+    text-align: center;
+  }
+
+  .dashboard-subtitle {
+    text-align: center;
+    padding-bottom: 1rem;
+  }
 }
 
 .products-dashboard {
@@ -52,6 +63,7 @@ const handleRefresh = () => {
   text-align: left;
   color: var(--text-color);
   padding-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .product-title {

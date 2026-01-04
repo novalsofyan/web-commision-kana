@@ -104,6 +104,7 @@ const handleLogin = async (): Promise<void> => {
   justify-content: center;
   align-items: center;
   background-color: var(--bg-color);
+  padding: 1rem;
 }
 
 .login-card {

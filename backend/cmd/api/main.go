@@ -44,7 +44,7 @@ func main() {
 
 	// Web server config & listen
 	cfg := &Config{
-		Addr:    ":8080",
+		Addr:    ":" + os.Getenv("APP_PORT"),
 		JSONres: jsRes,
 		Logger:  logger,
 		DBConf:  dbCfg,

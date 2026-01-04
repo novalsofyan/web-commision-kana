@@ -7,6 +7,8 @@ import (
 	"backend-web-commision-kana/internal/users"
 	"log/slog"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -19,10 +21,11 @@ import (
 func (api *Application) mount() http.Handler {
 	r := chi.NewRouter()
 
+	rawAllowdOrigin := os.Getenv("ALLOWED_ORIGINS")
+	allowedOrigins := strings.Split(rawAllowdOrigin, ",")
+
 	r.Use(cors.New(cors.Options{
-		AllowedOrigins: []string{
-			"http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4173",
-			"http://127.0.0.1:4173", "http://192.168.1.6:5173"},
+		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},

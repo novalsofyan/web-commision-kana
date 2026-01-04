@@ -2,16 +2,14 @@ services:
   db:
     image: postgres:17-alpine
     container_name: kana-commision-db
-    environment:
-      POSTGRES_USER: nosora
-      POSTGRES_PASSWORD: "1111"
-      POSTGRES_DB: kana_commision
+    env_file:
+      - .docker.env
     ports:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U nosora -d kana_commision"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -25,11 +23,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      - DB_URL=postgres://nosora:1111@db:5432/kana_commision?sslmode=disable
-      - GOOSE_DBSTRING=host=db port=5432 user=nosora password=1111 dbname=kana_commision sslmode=disable
-      - APP_PORT=8080
-      - PROJECT_ENV=production
+    env_file:
+      - .docker.env
 
 volumes:
   pgdata:
