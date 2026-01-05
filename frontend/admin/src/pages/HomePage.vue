@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import { useDarkMode } from '@/composables/useDarkMode'
 import { useAuthStore } from '@/stores/auth'
 
@@ -42,9 +42,12 @@ const handleLogin = async (): Promise<void> => {
     // Set auth di store
     authStore.setAuth(token, user)
     router.push('/dashboard')
-  } catch (err) {
-    const error = err as AxiosError<any>
-    errorMessage.value = error.response?.data?.data?.error || 'terjadi kesalahan internal pada server'
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      errorMessage.value = error.response?.data?.data?.error || 'terjadi kesalahan internal pada server'
+    } else {
+      errorMessage.value = 'terjadi kesalahan internal pada server'
+    }
   } finally {
     isLoading.value = false
   }
