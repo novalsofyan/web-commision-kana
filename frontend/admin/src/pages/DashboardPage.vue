@@ -4,11 +4,13 @@ import NavbarDashboard from '@/components/NavbarDashboard.vue'
 import ModalAddProduct from '@/components/ModalAddProduct.vue'
 import ProductList from '@/components/ProductList.vue'
 import { FilePlus } from 'lucide-vue-next'
+import { useProductStore } from '@/stores/product'
 
 const isModalOpen = ref(false)
+const productStore = useProductStore()
 
-const handleRefresh = () => {
-  console.log('Data perlu di-refresh ke API...')
+const handleCreated = async () => {
+  await productStore.fetchProducts()
 }
 </script>
 
@@ -23,13 +25,13 @@ const handleRefresh = () => {
           <p>Manajemen Produk</p>
           <FilePlus class="plus-product" @click="isModalOpen = true" />
         </div>
+        <ProductList />
       </div>
-      <ProductList />
     </main>
 
     <NavbarDashboard />
 
-    <ModalAddProduct :is-open="isModalOpen" @close="isModalOpen = false" @refresh="handleRefresh" />
+    <ModalAddProduct :is-open="isModalOpen" @close="isModalOpen = false" @created="handleCreated" />
   </div>
 </template>
 
@@ -48,20 +50,18 @@ const handleRefresh = () => {
   flex: 1;
   padding: 2rem;
 
-  .dashboard-title {
+  .dashboard-title,
+  .dashboard-subtitle {
     text-align: center;
   }
 
   .dashboard-subtitle {
-    text-align: center;
     padding-bottom: 1rem;
   }
 }
 
 .products-dashboard {
   border-top: 0.1rem solid var(--primary-color);
-  text-align: left;
-  color: var(--text-color);
   padding-top: 1rem;
   margin-bottom: 1rem;
 }
@@ -71,10 +71,12 @@ const handleRefresh = () => {
   font-weight: bold;
   display: flex;
   justify-content: space-between;
+  margin-bottom: 1rem;
 
   .plus-product {
     color: var(--primary-color);
     cursor: pointer;
+
     &:hover {
       transform: scale(1.1);
     }

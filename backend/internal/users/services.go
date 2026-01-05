@@ -31,7 +31,8 @@ func (s *svc) Login(ctx context.Context, req ReqLogin) (*ResLogin, error) {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errors.New("username atau password salah")
 		}
-		return nil, err
+		slog.Error("Login FindUsername error", "error", err)
+		return nil, errors.New("terjadi kesalahan internal pada server")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))

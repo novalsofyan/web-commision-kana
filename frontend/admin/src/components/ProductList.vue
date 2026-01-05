@@ -1,37 +1,43 @@
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, onMounted } from 'vue'
+import { useProductStore } from '@/stores/product'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   setup() {
-    const products = ref([
-      { id: 1, name: 'Kana Commission - Basic Pack', price: 150000 },
-      { id: 2, name: 'Fullstack Mastery Web', price: 500000 },
-    ])
+    const productStore = useProductStore()
+    const { products, loading } = storeToRefs(productStore)
+
+    onMounted(() => {
+      if (products.value.length === 0) {
+        productStore.fetchProducts()
+      }
+    })
 
     const handleEdit = (id: number) => {
-      console.log(id)
+      console.log('Edit product', id)
     }
 
-    const handleDelete = (id: number) => {
-      console.log(id)
+    const handleDelete = async (id: number) => {
+      await productStore.deleteProduct(id)
     }
 
-    const formatPrice = (value: number) => {
-      return new Intl.NumberFormat('id-ID', {
+    const formatPrice = (value: number) =>
+      new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 2,
       }).format(value)
-    }
 
-    return { products, handleEdit, handleDelete, formatPrice }
+    return { products, loading, handleEdit, handleDelete, formatPrice }
   },
 })
 </script>
 
 <template>
   <div class="pl-container">
-    <table class="pl-table">
+    <div v-if="loading">Loading...</div>
+    <table v-else class="pl-table">
       <thead>
         <tr>
           <th class="name-col">Product Name</th>
@@ -40,17 +46,17 @@ export default defineComponent({
         </tr>
       </thead>
       <tbody>
-        <tr v-for="product in products" :key="product.id">
-          <td data-label="Product Name" class="name-col">
-            <span class="value">{{ product.name }}</span>
+        <tr v-for="product in products" :key="product.product_id">
+          <td class="name-col" data-label="Product Name">
+            <span class="value">{{ product.product_name }}</span>
           </td>
-          <td data-label="Price" class="price-col">
-            <span class="value price">{{ formatPrice(product.price) }}</span>
+          <td class="price-col" data-label="Price">
+            <span class="value price">{{ formatPrice(product.product_price) }}</span>
           </td>
-          <td data-label="Actions" class="actions-col">
+          <td class="actions-col" data-label="Actions">
             <div class="pl-actions">
-              <button @click="handleEdit(product.id)" class="btn btn--edit">Edit</button>
-              <button @click="handleDelete(product.id)" class="btn btn--delete">Delete</button>
+              <button @click="handleEdit(product.product_id)" class="btn btn--edit">Edit</button>
+              <button @click="handleDelete(product.product_id)" class="btn btn--delete">Delete</button>
             </div>
           </td>
         </tr>
@@ -74,7 +80,7 @@ export default defineComponent({
     width: 100%;
     border-collapse: collapse;
 
-    // Mobile First
+    /* MOBILE FIRST */
     thead {
       display: none;
     }
@@ -82,8 +88,8 @@ export default defineComponent({
     tr {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
-      padding: 2.5rem 1rem;
+      gap: 1rem;
+      padding: 2rem 1rem;
       border-bottom: 0.1rem solid gray;
 
       &:last-child {
@@ -106,9 +112,9 @@ export default defineComponent({
       }
 
       .value {
-        color: var(--text-color);
         font-size: 1.6rem;
         font-weight: 500;
+        color: var(--text-color);
 
         &.price {
           color: var(--primary-color);
@@ -121,11 +127,10 @@ export default defineComponent({
     .pl-actions {
       display: flex;
       gap: 1rem;
-      margin-top: 0.8rem;
 
       .btn {
         flex: 1;
-        padding: 1.2rem;
+        padding: 0.7rem;
         border-radius: 1rem;
         border: none;
         font-weight: 700;
@@ -144,20 +149,19 @@ export default defineComponent({
       }
     }
 
-    // Desktop
+    /* DESKTOP */
     @media (min-width: 1024px) {
       thead {
         display: table-header-group;
 
         th {
-          padding: 0 1rem 1.5rem 1rem;
+          padding: 1rem;
           border-bottom: 0.2rem solid var(--primary-color);
           font-size: 1.6rem;
           font-weight: 800;
           text-transform: uppercase;
           color: var(--text-color);
           text-align: left;
-          letter-spacing: 0.1rem;
         }
 
         .actions-col {
@@ -171,32 +175,27 @@ export default defineComponent({
 
       td {
         display: table-cell;
-        padding: 2rem 1rem;
+        padding: 1rem;
         vertical-align: middle;
-
         &::before {
           display: none;
         }
-
-        .value {
-          font-size: 1.5rem;
-        }
-      }
-
-      .actions-col {
-        width: 20rem;
       }
 
       .pl-actions {
-        justify-content: center;
         margin-top: 0;
+        justify-content: center;
 
         .btn {
           flex: 0 1 auto;
           width: 9rem;
-          padding: 0.8rem;
-          font-size: 1.2rem;
+          padding: 0.6rem;
+          font-size: 1.5rem;
         }
+      }
+
+      .value {
+        font-size: 1.5rem;
       }
     }
   }

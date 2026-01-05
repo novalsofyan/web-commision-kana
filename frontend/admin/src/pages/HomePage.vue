@@ -3,8 +3,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import axios, { AxiosError } from 'axios'
 import { useDarkMode } from '@/composables/useDarkMode'
+import { useAuthStore } from '@/stores/auth'
 
-// Interface buat response API
 interface LoginResponse {
   data: {
     token: string
@@ -14,8 +14,8 @@ interface LoginResponse {
 
 const { setTheme, currentTheme } = useDarkMode()
 const router = useRouter()
+const authStore = useAuthStore()
 
-// Reaktif variabel
 const username = ref<string>('')
 const password = ref<string>('')
 const isLoading = ref<boolean>(false)
@@ -23,7 +23,7 @@ const errorMessage = ref<string>('')
 
 const handleLogin = async (): Promise<void> => {
   if (!username.value || !password.value) {
-    errorMessage.value = 'Isi dulu username & password-nya ya!'
+    errorMessage.value = 'username atau password tidak boleh kosong'
     return
   }
 
@@ -37,11 +37,14 @@ const handleLogin = async (): Promise<void> => {
     })
 
     const token = response.data.data.token
-    sessionStorage.setItem('auth_token', token)
+    const user = { username: response.data.data.username }
+
+    // Set auth di store
+    authStore.setAuth(token, user)
     router.push('/dashboard')
   } catch (err) {
-    const error = err as AxiosError<{ message?: string }>
-    errorMessage.value = error.response?.data?.message || 'Gagal login, cek koneksi!'
+    const error = err as AxiosError<any>
+    errorMessage.value = error.response?.data?.data?.error || 'terjadi kesalahan internal pada server'
   } finally {
     isLoading.value = false
   }

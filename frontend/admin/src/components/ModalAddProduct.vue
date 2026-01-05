@@ -1,46 +1,33 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import axios from 'axios'
+import { useProductStore } from '@/stores/product'
 
 defineProps<{
   isOpen: boolean
 }>()
 
-const emit = defineEmits(['close', 'refresh'])
+const emit = defineEmits(['close', 'created'])
+const productStore = useProductStore()
 
 const productName = ref('')
-const productPrice = ref('')
+const productPrice = ref<number | null>(null)
 
 const closeModal = () => {
   productName.value = ''
-  productPrice.value = ''
+  productPrice.value = null
   emit('close')
 }
 
-const addProduct = async (): Promise<void> => {
-  const token = sessionStorage.getItem('auth_token')
+const addProduct = async () => {
+  if (!productName.value || productPrice.value === null) return
 
-  const payload = {
+  await productStore.createProduct({
     product_name: productName.value,
-    product_price: Number(productPrice.value),
-  }
+    product_price: productPrice.value,
+  })
 
-  try {
-    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/admin/products`, payload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    })
-
-    emit('refresh')
-    closeModal()
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error('Detail Error:', error.response?.data)
-    }
-    alert('Gagal menambahkan produk!')
-  }
+  emit('created')
+  closeModal()
 }
 </script>
 
@@ -99,7 +86,6 @@ const addProduct = async (): Promise<void> => {
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  color: var(--text-color);
 }
 
 .modal-header {
@@ -108,11 +94,12 @@ const addProduct = async (): Promise<void> => {
   align-items: center;
   margin-bottom: 1.5rem;
 
-  h3 {
+  h2 {
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--primary-color);
   }
+
   .close-btn {
     background: none;
     border: none;
@@ -122,28 +109,27 @@ const addProduct = async (): Promise<void> => {
   }
 }
 
-.modal-body {
-  .input-group {
-    margin-bottom: 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+.modal-body .input-group {
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 
-    label {
-      font-size: 1.4rem;
-      font-weight: 600;
-      opacity: 0.8;
-    }
-    input {
-      padding: 0.8rem;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      background: #f9f9f9;
-      font-family: inherit;
-      &:focus {
-        outline: 2px solid var(--primary-color);
-        border-color: transparent;
-      }
+  label {
+    font-size: 1.4rem;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+
+  input {
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+    font-family: inherit;
+    &:focus {
+      outline: 2px solid var(--primary-color);
+      border-color: transparent;
     }
   }
 }
@@ -169,6 +155,7 @@ const addProduct = async (): Promise<void> => {
       background: #ddd;
     }
   }
+
   .btn-primary {
     background: var(--primary-color);
     border: none;
@@ -183,7 +170,7 @@ const addProduct = async (): Promise<void> => {
   }
 }
 
-// Transition Animation
+// Transition
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.1s ease;

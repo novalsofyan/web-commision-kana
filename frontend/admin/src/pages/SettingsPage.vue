@@ -2,12 +2,14 @@
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import NavbarDashboard from '@/components/NavbarDashboard.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const logout = async () => {
   try {
-    const token = sessionStorage.getItem('auth_token')
+    const token = authStore.token
     if (token) {
       await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`,
@@ -20,7 +22,8 @@ const logout = async () => {
   } catch (error) {
     console.error('Logout backend gagal:', error)
   } finally {
-    sessionStorage.removeItem('auth_token')
+    // Clear auth dari store
+    authStore.clearAuth()
     router.push('/login')
   }
 }

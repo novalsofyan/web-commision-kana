@@ -5,8 +5,12 @@ import (
 	"backend-web-commision-kana/internal/repo"
 	"backend-web-commision-kana/internal/utils/jsonresp"
 	"context"
+	"errors"
+	"log/slog"
 	"net/http"
 	"strings"
+
+	"github.com/jackc/pgx/v5"
 )
 
 func AuthMiddleware(queries *repo.Queries, resp jsonresp.JSONResponder) func(http.Handler) http.Handler {
@@ -25,9 +29,16 @@ func AuthMiddleware(queries *repo.Queries, resp jsonresp.JSONResponder) func(htt
 
 			userID, err := queries.SelectUserBySession(r.Context(), token)
 			if err != nil {
-				resp.WriteData(w, http.StatusUnauthorized, map[string]string{
-					"error": "Unauthorized",
-				})
+				if errors.Is(err, pgx.ErrNoRows) {
+					resp.WriteData(w, http.StatusUnauthorized, map[string]string{
+						"error": "Unauthorized",
+					})
+				} else {
+					slog.Error("DATABASE CRITICAL ERROR", "err", err)
+					resp.WriteData(w, http.StatusInternalServerError, map[string]string{
+						"error": "Server error: Database error",
+					})
+				}
 				return
 			}
 

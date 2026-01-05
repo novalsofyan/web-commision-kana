@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import axios from 'axios'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -33,39 +33,33 @@ const router = createRouter({
   ],
 })
 
-// Middleware Global (Navigation Guard)
+// Middleware Global
 router.beforeEach(async (to, from, next) => {
-  const token = sessionStorage.getItem('auth_token')
+  const authStore = useAuthStore()
 
-  // 1. Cek apakah halaman yang dituju (atau parent-nya) butuh auth
+  // Initialize auth store dulu
+  if (!authStore.isInitialized) {
+    await authStore.initialize()
+  }
+
+  // Cek apakah halaman butuh auth
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    // Kalau nggak ada token, langsung tendang ke Login
-    if (!token) {
+    // Validasi auth
+    const isValid = await authStore.validateAuth()
+
+    if (!isValid) {
       return next({ name: 'Login' })
     }
 
-    try {
-      // Validasi token ke backend
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://192.168.1.6:8080'
-      await axios.get(`${baseUrl}/api/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      next()
-    } catch (err) {
-      console.error('Auth Validation Failed', err)
-      sessionStorage.removeItem('auth_token')
-      next({ name: 'Login' })
-    }
+    next()
   }
 
-  // 2. Kalau user sudah login (punya token) tapi iseng mau buka halaman login
-  else if (to.name === 'Login' && token) {
+  // Kalau user sudah login tapi mau ke halaman login atau home
+  else if ((to.name === 'Login' || to.name === 'Home') && authStore.isAuthenticated) {
     next({ name: 'Dashboard' })
   }
 
-  // 3. Halaman umum (Login atau 404)
+  // Halaman umum
   else {
     next()
   }

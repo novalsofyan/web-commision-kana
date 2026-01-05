@@ -1,13 +1,29 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import { useDarkMode } from '@/composables/useDarkMode'
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 
 const { initTheme } = useDarkMode()
+const authStore = useAuthStore()
+let refreshInterval: ReturnType<typeof setInterval> | null = null
 
-// Inisialisasi tema global di root aplikasi
 onMounted(() => {
   initTheme()
+  // Cek auth tiap 5 menit (300.000 ms)
+  refreshInterval = setInterval(
+    () => {
+      if (authStore.token) {
+        authStore.silentRefresh()
+      }
+    },
+    5 * 60 * 1000,
+  )
+})
+
+onUnmounted(() => {
+  // Biar gak memory leak
+  if (refreshInterval) clearInterval(refreshInterval)
 })
 </script>
 
