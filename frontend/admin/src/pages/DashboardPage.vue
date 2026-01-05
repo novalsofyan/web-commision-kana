@@ -4,14 +4,8 @@ import NavbarDashboard from '@/components/NavbarDashboard.vue'
 import ModalAddProduct from '@/components/ModalAddProduct.vue'
 import ProductList from '@/components/ProductList.vue'
 import { FilePlus } from 'lucide-vue-next'
-import { useProductStore } from '@/stores/product'
 
 const isModalOpen = ref(false)
-const productStore = useProductStore()
-
-const handleCreated = async () => {
-  await productStore.fetchProducts()
-}
 </script>
 
 <template>
@@ -31,7 +25,7 @@ const handleCreated = async () => {
 
     <NavbarDashboard />
 
-    <ModalAddProduct :is-open="isModalOpen" @close="isModalOpen = false" @created="handleCreated" />
+    <ModalAddProduct :is-open="isModalOpen" @close="isModalOpen = false" />
   </div>
 </template>
 

@@ -6,7 +6,7 @@ defineProps<{
   isOpen: boolean
 }>()
 
-const emit = defineEmits(['close', 'created'])
+const emit = defineEmits(['close'])
 const productStore = useProductStore()
 
 const productName = ref('')
@@ -26,7 +26,6 @@ const addProduct = async () => {
     product_price: productPrice.value,
   })
 
-  emit('created')
   closeModal()
 }
 </script>
