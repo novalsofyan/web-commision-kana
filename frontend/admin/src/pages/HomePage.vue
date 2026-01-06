@@ -105,11 +105,12 @@ const handleLogin = async (): Promise<void> => {
 
 <style lang="scss" scoped>
 .login-page {
+  color: var(--text-color);
+  background: var(--bg-color);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--bg-color);
   padding: 1rem;
 }
 
@@ -178,7 +179,7 @@ const handleLogin = async (): Promise<void> => {
 .login-btn {
   width: 100%;
   padding: 14px;
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   color: white;
   border: none;
   border-radius: 10px;

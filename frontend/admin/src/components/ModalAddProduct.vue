@@ -80,6 +80,7 @@ const addProduct = async () => {
 
 .modal-content {
   background: var(--bg-color);
+  color: var(--text-color);
   width: 90%;
   max-width: 450px;
   border-radius: 16px;

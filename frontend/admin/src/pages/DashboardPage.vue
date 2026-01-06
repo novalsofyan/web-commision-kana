@@ -21,9 +21,8 @@ const isModalOpen = ref(false)
         </div>
         <ProductList />
       </div>
+      <NavbarDashboard />
     </main>
-
-    <NavbarDashboard />
 
     <ModalAddProduct :is-open="isModalOpen" @close="isModalOpen = false" />
   </div>
@@ -31,18 +30,15 @@ const isModalOpen = ref(false)
 
 <style lang="scss" scoped>
 .layout-wrapper {
-  min-height: 100vh;
+  margin: 0 auto;
+  color: var(--text-color);
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-color);
   max-width: 1200px;
-  padding-bottom: 8rem;
-  margin: 0 auto;
 }
 
 .dashboard-container {
-  flex: 1;
-  padding: 2rem;
+  padding: 2rem 2rem 10rem;
 
   .dashboard-title,
   .dashboard-subtitle {
@@ -57,7 +53,6 @@ const isModalOpen = ref(false)
 .products-dashboard {
   border-top: 0.1rem solid var(--primary-color);
   padding-top: 1rem;
-  margin-bottom: 1rem;
 }
 
 .product-title {
@@ -67,12 +62,21 @@ const isModalOpen = ref(false)
   justify-content: space-between;
   margin-bottom: 1rem;
 
+  @media (min-width: 768px) {
+    font-size: 2.4rem;
+  }
+
   .plus-product {
     color: var(--primary-color);
     cursor: pointer;
 
     &:hover {
       transform: scale(1.1);
+    }
+
+    @media (min-width: 768px) {
+      width: 3.4rem;
+      height: 3.4rem;
     }
   }
 }

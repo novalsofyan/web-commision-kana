@@ -1,9 +1,10 @@
 // src/scss/_variables.scss
 
 :root {
-  --bg-color: #ffffff;
+  --bg-color: linear-gradient(180deg, #e7feff 0%, #ebffe7 100%);
   --text-color: #333333;
-  --primary-color: #66cf8e;
+  --primary-color: #71baffd8;
+  --price-color: green;
   --card-bg-color: rgba(255, 255, 255, 1);
 }
 
@@ -11,6 +12,7 @@
 [data-theme='dark'] {
   --bg-color: #333333;
   --text-color: #e0e0e0;
-  --primary-color: #5ab87e;
+  --primary-color: #71baff;
+  --price-color: greenyellow;
   --card-bg-color: rgba(83, 83, 83, 0.6);
 }

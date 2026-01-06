@@ -13,6 +13,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var (
+	ErrInvalidCredentials = errors.New("username atau password salah")
+	ErrInternalServer     = errors.New("terjadi kesalahan internal pada server")
+)
+
 type svc struct {
 	repo *repo.Queries
 	db   *pgxpool.Pool
@@ -29,21 +34,21 @@ func (s *svc) Login(ctx context.Context, req ReqLogin) (*ResLogin, error) {
 	user, err := s.repo.FindUsername(ctx, req.Username)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errors.New("username atau password salah")
+			return nil, ErrInvalidCredentials
 		}
 		slog.Error("Login FindUsername error", "error", err)
-		return nil, errors.New("terjadi kesalahan internal pada server")
+		return nil, ErrInternalServer
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		return nil, errors.New("username atau password salah")
+		return nil, ErrInvalidCredentials
 	}
 
 	token, err := security.GenerateRandomToken(64)
 	if err != nil {
 		slog.Error("Gagal membuat token", "error", err)
-		return nil, errors.New("terjadi kesalahan internal pada server")
+		return nil, ErrInternalServer
 	}
 
 	savedToken, err := s.repo.SetToken(ctx, repo.SetTokenParams{
@@ -52,7 +57,7 @@ func (s *svc) Login(ctx context.Context, req ReqLogin) (*ResLogin, error) {
 	})
 	if err != nil {
 		slog.Error("Gagal menyimpan token ke database", "error", err)
-		return nil, errors.New("terjadi kesalahan internal pada server")
+		return nil, ErrInternalServer
 	}
 
 	return &ResLogin{
@@ -64,7 +69,7 @@ func (s *svc) Login(ctx context.Context, req ReqLogin) (*ResLogin, error) {
 func (s *svc) Logout(ctx context.Context, token string) (*ResLogout, error) {
 	if err := s.repo.DeleteSessionByToken(ctx, token); err != nil {
 		slog.Error("Gagal menghapus sesi", "error", err)
-		return nil, errors.New("gagal logout, silahkan coba lagi")
+		return nil, ErrInternalServer
 	}
 
 	return &ResLogout{

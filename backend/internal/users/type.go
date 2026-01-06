@@ -2,7 +2,6 @@
 package users
 
 import (
-	"backend-web-commision-kana/internal/utils/jsonresp"
 	"context"
 )
 
@@ -27,8 +26,4 @@ type ReqLogout struct {
 
 type ResLogout struct {
 	Msg string `json:"msg"`
-}
-
-type Res struct {
-	JSONres jsonresp.JSONResponder
 }

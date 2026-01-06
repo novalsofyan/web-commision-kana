@@ -3,6 +3,9 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 import NavbarDashboard from '@/components/NavbarDashboard.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useDarkMode } from '@/composables/useDarkMode'
+
+const { setTheme, currentTheme } = useDarkMode()
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -18,13 +21,12 @@ const logout = async () => {
           headers: { Authorization: `Bearer ${token}` },
         },
       )
+
+      authStore.clearAuth()
+      router.push('/login')
     }
   } catch (error) {
     console.error('Logout backend gagal:', error)
-  } finally {
-    // Clear auth dari store
-    authStore.clearAuth()
-    router.push('/login')
   }
 }
 </script>
@@ -35,6 +37,11 @@ const logout = async () => {
       <h1>⚙️ Settings</h1>
 
       <button class="btn-logout" @click="logout">Logout</button>
+      <div class="theme-options">
+        <button @click="setTheme('light')" :class="{ 'is-active': currentTheme === 'light' }">☀️</button>
+        <button @click="setTheme('dark')" :class="{ 'is-active': currentTheme === 'dark' }">🌙</button>
+        <button @click="setTheme('system')" :class="{ 'is-active': currentTheme === 'system' }">💻</button>
+      </div>
 
       <div class="content-placeholder"></div>
     </main>
@@ -45,10 +52,9 @@ const logout = async () => {
 
 <style lang="scss" scoped>
 .layout-wrapper {
-  min-height: 100vh;
+  color: var(--text-color);
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-color, #f9fafb);
 }
 
 .dashboard-container {
@@ -61,7 +67,7 @@ const logout = async () => {
 .btn-logout {
   margin-top: 1rem;
   padding: 0.6rem 1.2rem;
-  background-color: #ff4d4f;
+  background: #ff4d4f;
   color: white;
   border: none;
   border-radius: 8px;
@@ -71,6 +77,26 @@ const logout = async () => {
 
   &:hover {
     opacity: 0.8;
+  }
+}
+
+.theme-options {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+
+  button {
+    background: rgba(var(--text-color), 0.1);
+    border: 2px solid transparent;
+    padding: 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+
+    &.is-active {
+      border-color: var(--primary-color);
+    }
   }
 }
 

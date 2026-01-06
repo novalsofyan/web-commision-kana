@@ -10,7 +10,7 @@
 <style scoped>
 .not-found {
   color: var(--text-color);
-  background-color: var(--bg-color);
+  background: var(--bg-color);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -30,12 +30,12 @@ h2 {
 .back-btn {
   margin-top: 1.5rem;
   padding: 0.8rem 1.5rem;
-  background-color: #2f3542;
+  background: #2f3542;
   color: white;
   text-decoration: none;
   border-radius: 8px;
 }
 .back-btn:hover {
-  background-color: #57606f;
+  background: #57606f;
 }
 </style>

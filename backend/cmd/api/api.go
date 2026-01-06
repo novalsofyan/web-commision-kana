@@ -92,17 +92,16 @@ func (api *Application) mount() http.Handler {
 	return r
 }
 
-func (api *Application) run(h http.Handler) error {
+func (api *Application) run(h http.Handler) *http.Server {
 	server := &http.Server{
-		Addr:    api.Conf.Addr,
-		Handler: h,
-		// TimeOut Configuration
-		WriteTimeout: time.Second * 20,
-		ReadTimeout:  time.Second * 10,
-		IdleTimeout:  time.Second * 30,
+		Addr:         api.Conf.Addr,
+		Handler:      h,
+		WriteTimeout: 20 * time.Second,
+		ReadTimeout:  10 * time.Second,
+		IdleTimeout:  30 * time.Second,
 	}
 
 	slog.Info("Starting server . . .", "addr", api.Conf.Addr)
 
-	return server.ListenAndServe()
+	return server
 }

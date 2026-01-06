@@ -7,6 +7,9 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/go-chi/httplog/v3"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -14,7 +17,13 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
+	ctx, stop := signal.NotifyContext(
+		context.Background(),
+		os.Interrupt,
+		syscall.SIGTERM,
+	)
+	defer stop()
+
 	// Logger httplog + Elastic Common Schema
 	isConcise := true
 	logFormat := httplog.SchemaECS.Concise(isConcise)
@@ -22,6 +31,7 @@ func main() {
 		ReplaceAttr: logFormat.ReplaceAttr,
 	}))
 	slog.SetDefault(logger)
+
 	// JSON Response Writer
 	jsRes := jsonresp.NewResponder()
 
@@ -29,8 +39,8 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		slog.Warn("No .env file found!", "detail", err)
 	}
-	env := os.Getenv("PROJECT_ENV")
 
+	env := os.Getenv("PROJECT_ENV")
 	if env == "production" || env == "" {
 		isConcise = false
 	}
@@ -42,7 +52,6 @@ func main() {
 		minConns: 5,
 	}
 
-	// Web server config & listen
 	cfg := &Config{
 		Addr:    ":" + os.Getenv("APP_PORT"),
 		JSONres: jsRes,
@@ -62,7 +71,6 @@ func main() {
 	pCfg.MaxConns = int32(dbCfg.maxConns)
 	pCfg.MinConns = int32(dbCfg.minConns)
 
-	// buka pool pake
 	pool, err := pgxpool.NewWithConfig(ctx, pCfg)
 	if err != nil {
 		log.Fatal("Can't connect database", err)
@@ -73,11 +81,26 @@ func main() {
 	}
 
 	defer pool.Close()
-
 	web.DB = pool
 
-	if err := web.run(web.mount()); err != nil {
-		slog.Error("Server can't start!", "status", http.StatusInternalServerError, "error", err)
-		os.Exit(1)
+	// Goroutine Server (graceful shutdown)
+	srv := web.run(web.mount())
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			slog.Error("server error", "error", err)
+		}
+	}()
+
+	<-ctx.Done()
+
+	slog.Info("Shutting down server . . .")
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	err = srv.Shutdown(shutdownCtx)
+	if err != nil {
+		slog.Error("Server shutdown error", "error", err)
 	}
 }

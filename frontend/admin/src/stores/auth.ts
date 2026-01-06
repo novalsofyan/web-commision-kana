@@ -92,33 +92,33 @@ export const useAuthStore = defineStore('auth', {
     },
 
     // Silent refresh (untuk scaling)
-    async silentRefresh(): Promise<void> {
-      if (!this.token) return
+    // async silentRefresh(): Promise<void> {
+    //   if (!this.token) return
 
-      try {
-        const baseUrl = import.meta.env.VITE_API_BASE_URL
-        await axios.get(`${baseUrl}/api/auth/me`, {
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-          },
-        })
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          if (err.response) {
-            const status = err.response.status
-            if (status === 401) {
-              console.warn('Session telah berakhir.')
-              this.clearAuth()
-            } else {
-              console.error(`terjadi kesalahan internal pada server: ${status}`)
-            }
-          } else if (err.request) {
-            console.warn(`Network error`)
-          }
-        } else {
-          console.error('Error tak terduga:', err)
-        }
-      }
-    },
+    //   try {
+    //     const baseUrl = import.meta.env.VITE_API_BASE_URL
+    //     await axios.get(`${baseUrl}/api/auth/me`, {
+    //       headers: {
+    //         Authorization: `Bearer ${this.token}`,
+    //       },
+    //     })
+    //   } catch (err) {
+    //     if (axios.isAxiosError(err)) {
+    //       if (err.response) {
+    //         const status = err.response.status
+    //         if (status === 401) {
+    //           console.warn('Session telah berakhir.')
+    //           this.clearAuth()
+    //         } else {
+    //           console.error(`terjadi kesalahan internal pada server: ${status}`)
+    //         }
+    //       } else if (err.request) {
+    //         console.warn(`Network error`)
+    //       }
+    //     } else {
+    //       console.error('Error tak terduga:', err)
+    //     }
+    //   }
+    // },
   },
 })

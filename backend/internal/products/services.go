@@ -3,8 +3,13 @@ package products
 import (
 	"backend-web-commision-kana/internal/repo"
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+var (
+	ErrProductNotFound = errors.New("product not found")
 )
 
 type svc struct {
@@ -47,7 +52,7 @@ func (s *svc) DeleteProduct(ctx context.Context, productID int32) (*ResAdminProd
 	}
 
 	if result.RowsAffected() == 0 {
-		return nil, nil
+		return nil, ErrProductNotFound
 	}
 
 	return &ResAdminProduct{

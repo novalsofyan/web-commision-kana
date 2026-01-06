@@ -5,6 +5,8 @@ import (
 	"backend-web-commision-kana/internal/middleware/auth"
 	"backend-web-commision-kana/internal/utils/jsonresp"
 	"encoding/json"
+	"errors"
+	"log/slog"
 	"net/http"
 	"strconv"
 )
@@ -44,8 +46,9 @@ func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.svc.CreateProduct(r.Context(), req, userID)
 	if err != nil {
+		slog.Error("Internal server error", "error", err)
 		h.resp.WriteData(w, http.StatusInternalServerError, map[string]string{
-			"error": "Internal server error: " + err.Error(),
+			"error": "Internal server error",
 		})
 		return
 	}
@@ -66,15 +69,16 @@ func (h *Handler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.svc.DeleteProduct(r.Context(), int32(productID))
 	if err != nil {
-		h.resp.WriteData(w, http.StatusInternalServerError, map[string]string{
-			"error": "Internal server error: " + err.Error(),
-		})
-		return
-	}
+		if errors.Is(err, ErrProductNotFound) {
+			h.resp.WriteData(w, http.StatusNotFound, map[string]string{
+				"error": "Product not found",
+			})
+			return
+		}
 
-	if res == nil {
-		h.resp.WriteData(w, http.StatusNotFound, map[string]string{
-			"error": "Product not found",
+		slog.Error("Internal server error", "error", err)
+		h.resp.WriteData(w, http.StatusInternalServerError, map[string]string{
+			"error": "Internal server error",
 		})
 		return
 	}
@@ -93,8 +97,9 @@ func (h *Handler) GetProductAdmin(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.svc.GetProductAdmin(r.Context(), userID)
 	if err != nil {
+		slog.Error("Internal server error", "error", err)
 		h.resp.WriteData(w, http.StatusInternalServerError, map[string]string{
-			"error": "Internal server error: " + err.Error(),
+			"error": "Internal server error",
 		})
 		return
 	}

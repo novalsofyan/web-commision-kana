@@ -41,7 +41,7 @@ const menuItems = [
   width: 100%;
   max-width: 1200px;
   height: 70px;
-  background-color: var(--bg-color);
+  background: var(--bg-color);
   border: 1px solid var(--primary-color);
   border-radius: 15px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);

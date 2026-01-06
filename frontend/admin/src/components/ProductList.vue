@@ -70,10 +70,9 @@ export default defineComponent({
   background-color: var(--card-bg-color);
   width: 100%;
   border-radius: 2rem;
-  padding: 2rem;
+  padding: 0rem 2rem;
   box-sizing: border-box;
   backdrop-filter: blur(8px);
-  margin-bottom: 9rem;
   border: 0.1rem solid var(--primary-color);
 
   .pl-table {
@@ -105,10 +104,10 @@ export default defineComponent({
 
       &::before {
         content: attr(data-label);
-        font-size: 1.2rem;
-        font-weight: 700;
+        font-size: 1.6rem;
+        font-weight: 800;
         text-transform: uppercase;
-        color: var(--text-color);
+        color: var(--primary-color);
       }
 
       .value {
@@ -117,7 +116,7 @@ export default defineComponent({
         color: var(--text-color);
 
         &.price {
-          color: var(--primary-color);
+          color: var(--price-color);
           font-size: 1.8rem;
           font-weight: 700;
         }
@@ -150,7 +149,7 @@ export default defineComponent({
     }
 
     /* DESKTOP */
-    @media (min-width: 1024px) {
+    @media (min-width: 768px) {
       thead {
         display: table-header-group;
 
