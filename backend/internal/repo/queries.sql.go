@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createProducts = `-- name: CreateProducts :exec
@@ -135,4 +136,31 @@ func (q *Queries) SetToken(ctx context.Context, arg SetTokenParams) (string, err
 	var token string
 	err := row.Scan(&token)
 	return token, err
+}
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users
+SET 
+    username = COALESCE($1, username),
+    password = COALESCE($2, password)
+WHERE id = $3
+RETURNING id, username
+`
+
+type UpdateUserParams struct {
+	Username pgtype.Text `json:"username"`
+	Password pgtype.Text `json:"password"`
+	ID       int32       `json:"id"`
+}
+
+type UpdateUserRow struct {
+	ID       int32  `json:"id"`
+	Username string `json:"username"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (UpdateUserRow, error) {
+	row := q.db.QueryRow(ctx, updateUser, arg.Username, arg.Password, arg.ID)
+	var i UpdateUserRow
+	err := row.Scan(&i.ID, &i.Username)
+	return i, err
 }

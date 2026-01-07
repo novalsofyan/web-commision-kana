@@ -9,6 +9,7 @@ import (
 	"log/slog"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -17,6 +18,12 @@ var (
 	ErrInvalidCredentials = errors.New("username atau password salah")
 	ErrInternalServer     = errors.New("terjadi kesalahan internal pada server")
 )
+
+type Service interface {
+	Login(ctx context.Context, req ReqLogin) (*ResLogin, error)
+	Logout(ctx context.Context, token string) (*ResLogout, error)
+	UpdateProfile(ctx context.Context, userID int32, req ReqUpdateProfile) (*ResUpdateProfile, error)
+}
 
 type svc struct {
 	repo *repo.Queries
@@ -74,5 +81,36 @@ func (s *svc) Logout(ctx context.Context, token string) (*ResLogout, error) {
 
 	return &ResLogout{
 		Msg: "logout berhasil!",
+	}, nil
+}
+
+func (s *svc) UpdateProfile(ctx context.Context, userID int32, req ReqUpdateProfile) (*ResUpdateProfile, error) {
+	params := repo.UpdateUserParams{
+		ID:       userID,
+		Username: pgtype.Text{Valid: false},
+		Password: pgtype.Text{Valid: false},
+	}
+
+	if req.Username != nil {
+		params.Username = pgtype.Text{String: *req.Username, Valid: true}
+	}
+
+	if req.Password != nil && *req.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*req.Password), 12)
+		if err != nil {
+			slog.Error("Gagal hash password", "error", err)
+			return nil, ErrInternalServer
+		}
+		params.Password = pgtype.Text{String: string(hashedPassword), Valid: true}
+	}
+
+	updatedUser, err := s.repo.UpdateUser(ctx, params)
+	if err != nil {
+		slog.Error("Gagal update user", "error", err)
+		return nil, ErrInternalServer
+	}
+
+	return &ResUpdateProfile{
+		Username: updatedUser.Username,
 	}, nil
 }

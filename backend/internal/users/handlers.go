@@ -5,6 +5,7 @@ import (
 	auth "backend-web-commision-kana/internal/middleware/auth"
 	"backend-web-commision-kana/internal/utils/jsonresp"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 )
 
@@ -58,5 +59,25 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	h.resp.WriteData(w, http.StatusOK, res)
+}
+
+func (h *Handler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
+	var req ReqUpdateProfile
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		h.resp.WriteData(w, http.StatusBadRequest, map[string]string{"error": "Bad request"})
+		return
+	}
+	userID, ok := r.Context().Value(auth.UserIDKey).(int32)
+	if !ok {
+		h.resp.WriteData(w, http.StatusUnauthorized, map[string]string{"error": "Unauthorized"})
+		return
+	}
+	res, err := h.svc.UpdateProfile(r.Context(), userID, req)
+	if err != nil {
+		slog.Error("Error update profile", "err", err)
+		h.resp.WriteData(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
 	h.resp.WriteData(w, http.StatusOK, res)
 }

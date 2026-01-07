@@ -31,3 +31,11 @@ WHERE id = $1;
 SELECT id, nama_products, price 
 FROM products 
 WHERE user_id = $1;
+
+-- name: UpdateUser :one
+UPDATE users
+SET 
+    username = COALESCE(sqlc.narg('username'), username),
+    password = COALESCE(sqlc.narg('password'), password)
+WHERE id = sqlc.arg('id')
+RETURNING id, username;

@@ -85,6 +85,7 @@ func (api *Application) mount() http.Handler {
 				r.Get("/products", productHandler.GetProductAdmin)
 				r.Post("/products", productHandler.CreateProduct)
 				r.Delete("/products/{product_id}", productHandler.DeleteProduct)
+				r.Patch("/me", userHandler.UpdateProfile)
 			})
 		})
 	})

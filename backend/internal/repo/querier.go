@@ -19,6 +19,7 @@ type Querier interface {
 	SearchToken(ctx context.Context, token string) (string, error)
 	SelectUserBySession(ctx context.Context, token string) (int32, error)
 	SetToken(ctx context.Context, arg SetTokenParams) (string, error)
+	UpdateUser(ctx context.Context, arg UpdateUserParams) (UpdateUserRow, error)
 }
 
 var _ Querier = (*Queries)(nil)
