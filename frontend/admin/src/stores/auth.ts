@@ -91,34 +91,32 @@ export const useAuthStore = defineStore('auth', {
       sessionStorage.removeItem('auth_token')
     },
 
-    // Silent refresh (untuk scaling)
-    // async silentRefresh(): Promise<void> {
-    //   if (!this.token) return
+    // update profile
+    async updateProfile(payload: { username?: string; password?: string }) {
+      if (!this.token) {
+        throw new Error('Unauthorized')
+      }
 
-    //   try {
-    //     const baseUrl = import.meta.env.VITE_API_BASE_URL
-    //     await axios.get(`${baseUrl}/api/auth/me`, {
-    //       headers: {
-    //         Authorization: `Bearer ${this.token}`,
-    //       },
-    //     })
-    //   } catch (err) {
-    //     if (axios.isAxiosError(err)) {
-    //       if (err.response) {
-    //         const status = err.response.status
-    //         if (status === 401) {
-    //           console.warn('Session telah berakhir.')
-    //           this.clearAuth()
-    //         } else {
-    //           console.error(`terjadi kesalahan internal pada server: ${status}`)
-    //         }
-    //       } else if (err.request) {
-    //         console.warn(`Network error`)
-    //       }
-    //     } else {
-    //       console.error('Error tak terduga:', err)
-    //     }
-    //   }
-    // },
+      this.isValidating = true
+      try {
+        const baseUrl = import.meta.env.VITE_API_BASE_URL
+        const response = await axios.patch(`${baseUrl}/api/admin/me`, payload, {
+          headers: { Authorization: `Bearer ${this.token}` },
+        })
+
+        if (payload.username && this.user) {
+          this.user = { ...this.user, username: payload.username }
+        }
+
+        return { success: true, data: response.data.data }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.response?.data?.message || 'Update gagal')
+        }
+        throw error
+      } finally {
+        this.isValidating = false
+      }
+    },
   },
 })
