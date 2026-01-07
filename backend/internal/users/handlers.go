@@ -64,7 +64,10 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	var req ReqUpdateProfile
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	if err := decoder.Decode(&req); err != nil {
 		h.resp.WriteData(w, http.StatusBadRequest, map[string]string{"error": "Bad request"})
 		return
 	}

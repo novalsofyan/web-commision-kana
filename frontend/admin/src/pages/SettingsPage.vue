@@ -34,7 +34,7 @@ const logout = async () => {
 <template>
   <div class="layout-wrapper">
     <main class="dashboard-container">
-      <h1>⚙️ Settings</h1>
+      <h1 class="dashboard-title">Settings</h1>
 
       <button class="btn-logout" @click="logout">Logout</button>
       <div class="theme-options">
@@ -62,10 +62,20 @@ const logout = async () => {
   padding: 2rem;
   padding-bottom: 100px;
   text-align: center;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+
+  .dashboard-title {
+    font-size: 4rem;
+    font-weight: bold;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--primary-color);
+  }
 }
 
 .btn-logout {
-  margin-top: 1rem;
+  margin-top: 2rem;
   padding: 0.6rem 1.2rem;
   background: #ff4d4f;
   color: white;

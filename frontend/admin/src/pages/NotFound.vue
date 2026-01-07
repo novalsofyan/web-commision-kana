@@ -1,10 +1,10 @@
 <template>
-  <div class="not-found">
+  <main class="not-found">
     <h1>404</h1>
     <h2>Waduh! Halamannya Gak Ada...</h2>
     <p>Kayaknya kamu nyasar atau link-nya udah kedaluwarsa.</p>
     <router-link to="/" class="back-btn">Balik ke Home</router-link>
-  </div>
+  </main>
 </template>
 
 <style scoped>

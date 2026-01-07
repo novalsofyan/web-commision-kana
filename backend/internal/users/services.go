@@ -91,7 +91,7 @@ func (s *svc) UpdateProfile(ctx context.Context, userID int32, req ReqUpdateProf
 		Password: pgtype.Text{Valid: false},
 	}
 
-	if req.Username != nil {
+	if req.Username != nil && *req.Username != "" {
 		params.Username = pgtype.Text{String: *req.Username, Valid: true}
 	}
 

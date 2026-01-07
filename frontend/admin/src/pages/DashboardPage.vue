@@ -40,12 +40,14 @@ const isModalOpen = ref(false)
 .dashboard-container {
   padding: 2rem 2rem 10rem;
 
-  .dashboard-title,
-  .dashboard-subtitle {
+  .dashboard-title {
+    font-size: 4rem;
     text-align: center;
   }
 
   .dashboard-subtitle {
+    font-size: 2rem;
+    text-align: center;
     padding-bottom: 1rem;
   }
 }
