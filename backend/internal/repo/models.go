@@ -9,32 +9,32 @@ import (
 )
 
 type ImageMetum struct {
-	ID        int32            `json:"id"`
-	NamaImage string           `json:"nama_image"`
-	UrlImage  string           `json:"url_image"`
-	CreatedAt pgtype.Timestamp `json:"created_at"`
-	ProductID int32            `json:"product_id"`
+	ID        int32              `json:"id"`
+	NamaImage string             `json:"nama_image"`
+	UrlImage  string             `json:"url_image"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	ProductID int32              `json:"product_id"`
 }
 
 type Product struct {
-	ID           int32            `json:"id"`
-	NamaProducts string           `json:"nama_products"`
-	Price        int32            `json:"price"`
-	CreatedAt    pgtype.Timestamp `json:"created_at"`
-	UserID       int32            `json:"user_id"`
+	ID           int32              `json:"id"`
+	NamaProducts string             `json:"nama_products"`
+	Price        int32              `json:"price"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+	UserID       int32              `json:"user_id"`
 }
 
 type Session struct {
 	ID        int32              `json:"id"`
 	UserID    int32              `json:"user_id"`
 	Token     string             `json:"token"`
-	CreatedAt pgtype.Timestamp   `json:"created_at"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
 type User struct {
-	ID        int32            `json:"id"`
-	Username  string           `json:"username"`
-	Password  string           `json:"password"`
-	CreatedAt pgtype.Timestamp `json:"created_at"`
+	ID        int32              `json:"id"`
+	Username  string             `json:"username"`
+	Password  string             `json:"password"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
