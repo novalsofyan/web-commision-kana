@@ -3,13 +3,13 @@ SELECT id, username, password FROM users
 WHERE username = $1 LIMIT 1;
 
 -- name: SetToken :one
-INSERT INTO sessions (user_id, token)
-VALUES ($1, $2)
-RETURNING token;
+INSERT INTO sessions (user_id, token, expires_at)
+VALUES ($1, $2, NOW() + INTERVAL '30 days')
+RETURNING token, expires_at;
 
 -- name: SearchToken :one
 SELECT token FROM sessions
-WHERE token = $1;
+WHERE token = $1 AND expires_at > NOW();
 
 -- name: DeleteSessionByToken :exec
 DELETE FROM sessions
@@ -17,7 +17,11 @@ WHERE token = $1;
 
 -- name: SelectUserBySession :one
 SELECT user_id FROM sessions
-WHERE token = $1;
+WHERE token = $1 AND expires_at > NOW();
+
+-- name: CleanupExpiredSessions :exec
+DELETE FROM sessions
+WHERE expires_at <= NOW();
 
 -- name: CreateProducts :exec
 INSERT INTO products (nama_products, price, user_id)

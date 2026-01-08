@@ -8,7 +8,6 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"strings"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -16,10 +15,16 @@ import (
 func AuthMiddleware(queries *repo.Queries, resp jsonresp.JSONResponder) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			authHeader := r.Header.Get("Authorization")
-			token := strings.TrimPrefix(authHeader, "Bearer ")
-			token = strings.TrimSpace(token)
+			// Read token dari cookie
+			cookie, err := r.Cookie("auth_token")
+			if err != nil {
+				resp.WriteData(w, http.StatusUnauthorized, map[string]string{
+					"error": "Unauthorized",
+				})
+				return
+			}
 
+			token := cookie.Value
 			if token == "" {
 				resp.WriteData(w, http.StatusUnauthorized, map[string]string{
 					"error": "Unauthorized",

@@ -12,19 +12,16 @@ const authStore = useAuthStore()
 
 const logout = async () => {
   try {
-    const token = authStore.token
-    if (token) {
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      )
+    await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`,
+      {},
+      {
+        withCredentials: true,
+      },
+    )
 
-      authStore.clearAuth()
-      router.push('/login')
-    }
+    authStore.clearAuth()
+    router.push('/login')
   } catch (error) {
     console.error('Logout backend gagal:', error)
   }

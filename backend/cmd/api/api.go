@@ -5,6 +5,7 @@ import (
 	"backend-web-commision-kana/internal/products"
 	"backend-web-commision-kana/internal/repo"
 	"backend-web-commision-kana/internal/users"
+	"backend-web-commision-kana/internal/utils/scheduler"
 	"log/slog"
 	"net/http"
 	"os"
@@ -63,6 +64,9 @@ func (api *Application) mount() http.Handler {
 
 	productSvc := products.NewService(queries, api.DB)
 	productHandler := products.NewHandler(productSvc, api.Conf.JSONres)
+
+	// Initialize session cleanup scheduler (interval: 24 jam)
+	api.Scheduler = scheduler.NewSessionCleanupScheduler(queries, 24*time.Hour)
 
 	r.Route("/api", func(r chi.Router) {
 

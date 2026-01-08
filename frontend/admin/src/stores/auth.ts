@@ -8,34 +8,25 @@ interface User {
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null as User | null,
-    token: sessionStorage.getItem('auth_token') || null,
     isValidating: false,
     isInitialized: false,
   }),
 
   getters: {
-    isAuthenticated: (state) => !!state.user && !!state.token,
+    isAuthenticated: (state) => !!state.user,
   },
 
   actions: {
-    // Initialize - cek token saat app pertama load
+    // Initialize - cek auth saat app pertama load
     async initialize() {
       if (this.isInitialized) return
 
-      if (this.token) {
-        await this.validateAuth()
-      }
-
+      await this.validateAuth()
       this.isInitialized = true
     },
 
-    // Validasi token ke backend
+    // Validasi auth ke backend (cookie-based)
     async validateAuth() {
-      if (!this.token) {
-        this.user = null
-        return false
-      }
-
       if (this.user) return true
 
       if (this.isValidating) {
@@ -53,7 +44,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         const baseUrl = import.meta.env.VITE_API_BASE_URL
         const response = await axios.get(`${baseUrl}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${this.token}` },
+          withCredentials: true,
         })
 
         this.user = response.data.data || { username: 'User' }
@@ -61,7 +52,7 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 401) {
-            console.warn('Token invalid, clearing auth')
+            console.warn('Session invalid, clearing auth')
             this.clearAuth()
             return false
           }
@@ -77,31 +68,24 @@ export const useAuthStore = defineStore('auth', {
         this.isValidating = false
       }
     },
+
     // Set auth setelah login
-    setAuth(token: string, user?: User) {
-      this.token = token
-      this.user = user || null
-      sessionStorage.setItem('auth_token', token)
+    setAuth(user: User) {
+      this.user = user
     },
 
     // Clear auth (logout)
     clearAuth() {
       this.user = null
-      this.token = null
-      sessionStorage.removeItem('auth_token')
     },
 
     // update profile
     async updateProfile(payload: { username?: string; password?: string }) {
-      if (!this.token) {
-        throw new Error('Unauthorized')
-      }
-
       this.isValidating = true
       try {
         const baseUrl = import.meta.env.VITE_API_BASE_URL
         const response = await axios.patch(`${baseUrl}/api/admin/me`, payload, {
-          headers: { Authorization: `Bearer ${this.token}` },
+          withCredentials: true,
         })
 
         if (payload.username && this.user) {

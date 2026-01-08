@@ -5,15 +5,10 @@ import router from '@/router'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
+  withCredentials: true, // Kirim cookies dengan setiap request
 })
 
-api.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem('auth_token')
-  if (token) config.headers.Authorization = `Bearer ${token}`
-  config.headers.Accept = 'application/json'
-  return config
-})
-
+// Response interceptor untuk handle 401
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {

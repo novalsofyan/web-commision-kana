@@ -68,7 +68,7 @@ func (s *svc) Login(ctx context.Context, req ReqLogin) (*ResLogin, error) {
 	}
 
 	return &ResLogin{
-		Token:    savedToken,
+		Token:    savedToken.Token,
 		Username: user.Username,
 	}, nil
 }

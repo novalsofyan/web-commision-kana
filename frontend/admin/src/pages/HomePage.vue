@@ -7,8 +7,8 @@ import { useAuthStore } from '@/stores/auth'
 
 interface LoginResponse {
   data: {
-    token: string
     username: string
+    message: string
   }
 }
 
@@ -31,20 +31,25 @@ const handleLogin = async (): Promise<void> => {
   errorMessage.value = ''
 
   try {
-    const response = await axios.post<LoginResponse>(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
-      username: username.value,
-      password: password.value,
-    })
+    const response = await axios.post<LoginResponse>(
+      `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
+      {
+        username: username.value,
+        password: password.value,
+      },
+      {
+        withCredentials: true, // Penting untuk menerima cookies
+      },
+    )
 
-    const token = response.data.data.token
     const user = { username: response.data.data.username }
 
-    // Set auth di store
-    authStore.setAuth(token, user)
+    // Set auth di store (cookie sudah otomatis di-set oleh server)
+    authStore.setAuth(user)
     router.push('/dashboard')
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      errorMessage.value = error.response?.data?.data?.error || 'terjadi kesalahan internal pada server'
+      errorMessage.value = error.response?.data?.error || 'terjadi kesalahan internal pada server'
     } else {
       errorMessage.value = 'terjadi kesalahan internal pada server'
     }

@@ -12,6 +12,16 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const cleanupExpiredSessions = `-- name: CleanupExpiredSessions :exec
+DELETE FROM sessions
+WHERE expires_at <= NOW()
+`
+
+func (q *Queries) CleanupExpiredSessions(ctx context.Context) error {
+	_, err := q.db.Exec(ctx, cleanupExpiredSessions)
+	return err
+}
+
 const createProducts = `-- name: CreateProducts :exec
 INSERT INTO products (nama_products, price, user_id)
 VALUES ($1, $2, $3)
@@ -99,7 +109,7 @@ func (q *Queries) GetProductAdmin(ctx context.Context, userID int32) ([]GetProdu
 
 const searchToken = `-- name: SearchToken :one
 SELECT token FROM sessions
-WHERE token = $1
+WHERE token = $1 AND expires_at > NOW()
 `
 
 func (q *Queries) SearchToken(ctx context.Context, token string) (string, error) {
@@ -110,7 +120,7 @@ func (q *Queries) SearchToken(ctx context.Context, token string) (string, error)
 
 const selectUserBySession = `-- name: SelectUserBySession :one
 SELECT user_id FROM sessions
-WHERE token = $1
+WHERE token = $1 AND expires_at > NOW()
 `
 
 func (q *Queries) SelectUserBySession(ctx context.Context, token string) (int32, error) {
@@ -121,9 +131,9 @@ func (q *Queries) SelectUserBySession(ctx context.Context, token string) (int32,
 }
 
 const setToken = `-- name: SetToken :one
-INSERT INTO sessions (user_id, token)
-VALUES ($1, $2)
-RETURNING token
+INSERT INTO sessions (user_id, token, expires_at)
+VALUES ($1, $2, NOW() + INTERVAL '30 days')
+RETURNING token, expires_at
 `
 
 type SetTokenParams struct {
@@ -131,11 +141,16 @@ type SetTokenParams struct {
 	Token  string `json:"token"`
 }
 
-func (q *Queries) SetToken(ctx context.Context, arg SetTokenParams) (string, error) {
+type SetTokenRow struct {
+	Token     string             `json:"token"`
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+}
+
+func (q *Queries) SetToken(ctx context.Context, arg SetTokenParams) (SetTokenRow, error) {
 	row := q.db.QueryRow(ctx, setToken, arg.UserID, arg.Token)
-	var token string
-	err := row.Scan(&token)
-	return token, err
+	var i SetTokenRow
+	err := row.Scan(&i.Token, &i.ExpiresAt)
+	return i, err
 }
 
 const updateUser = `-- name: UpdateUser :one

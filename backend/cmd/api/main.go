@@ -86,6 +86,12 @@ func main() {
 	// Goroutine Server (graceful shutdown)
 	srv := web.run(web.mount())
 
+	// Start session cleanup scheduler setelah mount (scheduler sudah diinisialisasi di mount)
+	if web.Scheduler != nil {
+		web.Scheduler.Start()
+		defer web.Scheduler.Stop()
+	}
+
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			slog.Error("server error", "error", err)

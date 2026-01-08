@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend-web-commision-kana/internal/utils/jsonresp"
+	"backend-web-commision-kana/internal/utils/scheduler"
 	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -21,6 +22,7 @@ type Config struct {
 }
 
 type Application struct {
-	Conf *Config
-	DB   *pgxpool.Pool
+	Conf      *Config
+	DB        *pgxpool.Pool
+	Scheduler *scheduler.SessionCleanupScheduler
 }

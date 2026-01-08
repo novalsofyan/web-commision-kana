@@ -39,7 +39,22 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.resp.WriteData(w, http.StatusOK, res)
+	// Set HTTP-only cookie dengan expiry 30 hari
+	http.SetCookie(w, &http.Cookie{
+		Name:     "auth_token",
+		Value:    res.Token,
+		Path:     "/",
+		MaxAge:   30 * 24 * 60 * 60,
+		HttpOnly: true,
+		Secure:   false, // Set true di production dengan HTTPS
+		SameSite: http.SameSiteLaxMode,
+	})
+
+	// Response tanpa token (sudah di cookie)
+	h.resp.WriteData(w, http.StatusOK, map[string]string{
+		"username": res.Username,
+		"message":  "login berhasil",
+	})
 }
 
 func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
@@ -58,6 +73,17 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
+
+	// Clear cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "auth_token",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode,
+	})
 
 	h.resp.WriteData(w, http.StatusOK, res)
 }

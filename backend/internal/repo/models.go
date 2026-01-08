@@ -25,10 +25,11 @@ type Product struct {
 }
 
 type Session struct {
-	ID        int32            `json:"id"`
-	UserID    int32            `json:"user_id"`
-	Token     string           `json:"token"`
-	CreatedAt pgtype.Timestamp `json:"created_at"`
+	ID        int32              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Token     string             `json:"token"`
+	CreatedAt pgtype.Timestamp   `json:"created_at"`
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
 type User struct {
