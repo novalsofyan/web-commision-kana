@@ -49,7 +49,7 @@ const handleLogin = async (): Promise<void> => {
     router.push('/dashboard')
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      errorMessage.value = error.response?.data?.error || 'terjadi kesalahan internal pada server'
+      errorMessage.value = error.response?.data?.data.error || 'terjadi kesalahan internal pada server'
     } else {
       errorMessage.value = 'terjadi kesalahan internal pada server'
     }
